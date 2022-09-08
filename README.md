@@ -1,1 +1,1 @@
-# luizcarlosfaria-eshop-cloudnative-architecture
+# eshop-cloudnative-architecture
