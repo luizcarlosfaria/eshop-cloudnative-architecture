@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="./../eShopCloudNative.Architecture.targets" />
+
+  <ItemGroup>
+    <Folder Include="Messaging\" />
+  </ItemGroup>
+
+</Project>

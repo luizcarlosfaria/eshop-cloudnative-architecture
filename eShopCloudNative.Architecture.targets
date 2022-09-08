@@ -1,0 +1,20 @@
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <RootNamespace>eShopCloudNative.Architecture</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Authors>luizcarlosfaria</Authors>
+        <Company>gaGO.io | Cloud Native .NET</Company>
+        <Product>eShopCloudNative</Product>
+        <PackageProjectUrl>https://github.com/luizcarlosfaria/eshop-cloudnative/</PackageProjectUrl>
+        <PackageIcon>Oragon-Architecture-Penknife.export-150x150.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/luizcarlosfaria/eshop-cloudnative/</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <Version>0.0.6-alpha</Version>
+    </PropertyGroup>
+</Project>
