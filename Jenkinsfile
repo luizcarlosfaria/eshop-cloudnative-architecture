@@ -81,7 +81,7 @@ pipeline {
                         
                         dotnet build ./eShopCloudNative.Architecture.sln
 
-                        dotnet sonarscanner end
+                        dotnet sonarscanner end /d:sonar.login="$SONARQUBE_KEY"
                         '''
 
                 }
