@@ -76,12 +76,13 @@ pipeline {
                             /k:"luizcarlosfaria_eshop-cloudnative-architecture" \
                             /d:sonar.login="$SONARQUBE_KEY" \
                             /d:sonar.host.url="https://sonarcloud.io" \
-                            /d:sonar.cs.opencover.reportsPaths="./output-coverage/coverage.xml" \
-                            /d:sonar.coverage.exclusions="tests/**/*,Examples/**/*,**/*.CodeGen.cs" \
-                                /d:sonar.test.exclusions="tests/**/*,Examples/**/*,**/*.CodeGen.cs" \
-                                     /d:sonar.exclusions="tests/**/*,Examples/**/*,**/*.CodeGen.cs"
+                            /d:sonar.cs.opencover.it.reportsPaths="./output-coverage/coverage.xml" \
+                            /d:sonar.coverage.exclusions="eShopCloudNative.Architecture.Tests/**/*,Examples/**/*,**/*.CodeGen.cs" \
+                                /d:sonar.test.exclusions="eShopCloudNative.Architecture.Tests/**/*,Examples/**/*,**/*.CodeGen.cs" \
+                                     /d:sonar.exclusions="eShopCloudNative.Architecture.Tests/**/*,Examples/**/*,**/*.CodeGen.cs"
                         
                         dotnet build ./eShopCloudNative.Architecture.sln
+                        
                         dotnet sonarscanner end
                         '''
 
