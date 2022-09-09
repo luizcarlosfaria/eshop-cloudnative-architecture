@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.32804.182
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eShopCloudNative.Architecture.Bootstrap", "eShopCloudNative.Architecture.Bootstrap\eShopCloudNative.Architecture.Bootstrap.csproj", "{9CAD50DE-CC85-4352-8EB2-C4BCE8AE7049}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eShopCloudNative.Architecture.Data", "eShopCloudNative.Architecture.Data\eShopCloudNative.Architecture.Data.csproj", "{2DAE2564-0697-470D-878B-E62A30F2ED8B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eShopCloudNative.Architecture.Messaging", "eShopCloudNative.Architecture.Messaging\eShopCloudNative.Architecture.Messaging.csproj", "{B96A7C7F-12E8-4610-ACB6-8F321276E63F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eShopCloudNative.Architecture.Tests", "eShopCloudNative.Architecture.Tests\eShopCloudNative.Architecture.Tests.csproj", "{5630D732-4BB9-465C-B197-35DD770C6BC3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eShopCloudNative.Architecture.WebApi", "eShopCloudNative.Architecture.WebApi\eShopCloudNative.Architecture.WebApi.csproj", "{AE5A1DDA-83B7-48FD-8D96-75FC8CBFB75C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9CAD50DE-CC85-4352-8EB2-C4BCE8AE7049}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CAD50DE-CC85-4352-8EB2-C4BCE8AE7049}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CAD50DE-CC85-4352-8EB2-C4BCE8AE7049}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CAD50DE-CC85-4352-8EB2-C4BCE8AE7049}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DAE2564-0697-470D-878B-E62A30F2ED8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DAE2564-0697-470D-878B-E62A30F2ED8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DAE2564-0697-470D-878B-E62A30F2ED8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DAE2564-0697-470D-878B-E62A30F2ED8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B96A7C7F-12E8-4610-ACB6-8F321276E63F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B96A7C7F-12E8-4610-ACB6-8F321276E63F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B96A7C7F-12E8-4610-ACB6-8F321276E63F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B96A7C7F-12E8-4610-ACB6-8F321276E63F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5630D732-4BB9-465C-B197-35DD770C6BC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5630D732-4BB9-465C-B197-35DD770C6BC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5630D732-4BB9-465C-B197-35DD770C6BC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5630D732-4BB9-465C-B197-35DD770C6BC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE5A1DDA-83B7-48FD-8D96-75FC8CBFB75C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE5A1DDA-83B7-48FD-8D96-75FC8CBFB75C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE5A1DDA-83B7-48FD-8D96-75FC8CBFB75C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE5A1DDA-83B7-48FD-8D96-75FC8CBFB75C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CD1DBCB5-22C9-4458-81A8-BF98F9DCF9FA}
+	EndGlobalSection
+EndGlobal

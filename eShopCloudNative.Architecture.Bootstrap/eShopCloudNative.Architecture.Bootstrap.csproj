@@ -2,8 +2,8 @@
 
     <Import Project="./../eShopCloudNative.Architecture.targets" />
 
-  <ItemGroup>
-    <Folder Include="Bootstrap\" />
-  </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    </ItemGroup>
 
 </Project>
