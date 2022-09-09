@@ -65,10 +65,10 @@ pipeline {
                        
                         dotnet test ./eShopCloudNative.Architecture.Tests/eShopCloudNative.Architecture.Tests.csproj \
                             --configuration Debug \
-                            --output ./output-tests  \
+                            --output /output-tests  \
                             /p:CollectCoverage=true \
                             /p:CoverletOutputFormat=opencover \
-                            /p:CoverletOutput='./output-coverage/coverage.xml' \
+                            /p:CoverletOutput='/output-coverage/coverage.xml' \
                             /p:Exclude="[Oragon.*.Tests]*"
 
                         dotnet sonarscanner begin \
@@ -76,7 +76,7 @@ pipeline {
                             /k:luizcarlosfaria_eshop-cloudnative-architecture \
                             /d:sonar.login="$SONARQUBE_KEY" \
                             /d:sonar.host.url="https://sonarcloud.io" \
-                            /d:sonar.cs.opencover.reportsPaths="./output-coverage/coverage.xml"
+                            /d:sonar.cs.opencover.reportsPaths="/output-coverage/coverage.xml"
                             
                         
                         dotnet build ./eShopCloudNative.Architecture.sln
