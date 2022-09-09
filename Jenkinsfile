@@ -11,7 +11,7 @@ pipeline {
 
             agent {
                 dockerfile {
-                    args '-u root:root -v /gago/nuget-cache:~/.nuget/packages'
+                    args '-u root:root -v /gago/nuget-cache:/root/.nuget/packages'
                 }
             }
 
@@ -30,7 +30,7 @@ pipeline {
 
             agent {
                 dockerfile {
-                    args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock -v /gago/nuget-cache:~/.nuget/packages '
+                    args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock -v /gago/nuget-cache:/root/.nuget/packages '
                 }
             }
 
@@ -71,7 +71,7 @@ pipeline {
 
             agent {
                 dockerfile {
-                    args '-u root:root -v /gago/nuget-cache:~/.nuget/packages '
+                    args '-u root:root -v /gago/nuget-cache:/root/.nuget/packages '
                 }
             }
 

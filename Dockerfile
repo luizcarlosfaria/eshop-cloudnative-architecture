@@ -20,5 +20,6 @@ ENV PATH="$PATH:/root/.dotnet/tools"
 RUN dotnet tool install --global dotnet-sonarscanner
 RUN dotnet tool install --global coverlet.console
 
+RUN mkdir /root/.nuget/packages
 
 RUN /var/lib/dpkg/info/ca-certificates-java.postinst configure
