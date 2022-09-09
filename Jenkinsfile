@@ -11,9 +11,6 @@ pipeline {
 
             agent {
                 dockerfile {
-                    // alwaysPull false
-                    // image 'microsoft/dotnet:2.2-sdk'
-                    // reuseNode false
                     args '-u root:root'
                 }
             }
@@ -28,31 +25,11 @@ pipeline {
 
         }
         
-        stage('Setup databases') {
-            
-            agent any
-            
-            steps {
-
-                    sh  '''
-
-                        #docker-compose up -d
-
-                        #sleep 60
-
-                        '''
-            }
-
-        }
-
 
         stage('Test') {
 
             agent {
                 dockerfile {
-                    // alwaysPull false
-                    // image 'microsoft/dotnet:2.2-sdk'
-                    // reuseNode false
                     args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
@@ -94,9 +71,6 @@ pipeline {
 
             agent {
                 dockerfile {
-                    // alwaysPull false
-                    // image 'microsoft/dotnet:2.2-sdk'
-                    // reuseNode false
                     args '-u root:root'
                 }
             }
@@ -108,8 +82,8 @@ pipeline {
                 script{
 
                     def projetcs = [
-                        './OreShopCloudNative.Architecture.Bootstrap/eShopCloudNative.Architecture.Bootstrap.csproj',
-						'./eShopCloudNative.Architecture.Data/eShopCloudNative.Architecture.Data.csproj'
+                        './OreShopCloudNative.Architecture.Bootstrap/eShopCloudNative.Architecture.Bootstrap.csproj'//,
+						//'./eShopCloudNative.Architecture.Data/eShopCloudNative.Architecture.Data.csproj'
                     ]
 
                     if (env.BRANCH_NAME.endsWith("-alpha")) {
@@ -157,9 +131,9 @@ pipeline {
                     
                     def publishOnNuGet = ( env.BRANCH_NAME.endsWith("-alpha") == false );
                         
-                        withCredentials([usernamePassword(credentialsId: 'myget-oragon', passwordVariable: 'MYGET_KEY', usernameVariable: 'DUMMY' )]) {
+                        withCredentials([usernamePassword(credentialsId: 'myget-eshop-cloud-native', passwordVariable: 'MYGET_KEY', usernameVariable: 'DUMMY' )]) {
 
-                        sh 'for pkg in ./output-packages/*.nupkg ; do dotnet nuget push "$pkg" -k "$MYGET_KEY" -s https://www.myget.org/F/oragon/api/v3/index.json -ss https://www.myget.org/F/oragon/symbols/api/v2/package ; done'
+                        sh 'for pkg in ./output-packages/*.nupkg ; do dotnet nuget push "$pkg" -k "$MYGET_KEY" -s https://www.myget.org/F/eshop-cloud-native/api/v3/index.json -ss https://www.myget.org/F/eshop-cloud-native/symbols/api/v2/package ; done'
 						
                         }
 
