@@ -82,7 +82,7 @@ pipeline {
                                      /d:sonar.exclusions="tests/**/*,Examples/**/*,**/*.CodeGen.cs"
                         
                         dotnet build ./eShopCloudNative.Architecture.sln
-                        dotnet sonarscanner end /d:sonar.login="$SONARQUBE_KEY"
+                        dotnet sonarscanner end
                         '''
 
                 }
