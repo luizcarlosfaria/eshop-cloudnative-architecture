@@ -22,7 +22,7 @@ pipeline {
                 
                 echo sh(script: 'env|sort', returnStdout: true)
 
-                sh 'dotnet build ./Oragon.Context.sln'
+                sh 'dotnet build ./eShopCloudNative.Architecture.sln'
 
             }
 
@@ -62,13 +62,7 @@ pipeline {
                  withCredentials([usernamePassword(credentialsId: 'SonarQube', passwordVariable: 'SONARQUBE_KEY', usernameVariable: 'SONARQUBE_USERNAME' )]) {
 
                     sh  '''
-
-                        #docker-compose up -d
-
-                        #sleep 190
-
-                        export PATH="$PATH:/root/.dotnet/tools"
-
+                       
                         dotnet test ./eShopCloudNative.Architecture.Tests/eShopCloudNative.Architecture.Tests.csproj \
                             --configuration Debug \
                             --output ./output-tests  \
