@@ -111,7 +111,7 @@ pipeline {
                         
                     withCredentials([usernamePassword(credentialsId: 'myget-eshop-cloud-native', passwordVariable: 'MYGET_KEY', usernameVariable: 'DUMMY' )]) {
 
-                        sh 'for pkg in ./output-packages/*.nupkg ; do dotnet nuget push "$pkg" -k "$MYGET_KEY" -s https://www.myget.org/F/eshop-cloud-native/api/v3/index.json -ss https://www.myget.org/F/eshop-cloud-native/symbols/api/v2/package ; done'
+                        sh 'for pkg in ./output-packages/*.nupkg ; do dotnet nuget push "$pkg" -k "$MYGET_KEY" -s https://www.myget.org/F/eshop-cloud-native/api/v3/index.json -ss https://www.myget.org/F/eshop-cloud-native/api/v3/index.json ; done'
 						
                     }
 
