@@ -177,7 +177,7 @@ pipeline {
             }
         }
     }
-    post {
+    /*post {
 
         always {
             node('master'){
@@ -191,5 +191,5 @@ pipeline {
 
             }
         }
-    }
+    }*/
 }
