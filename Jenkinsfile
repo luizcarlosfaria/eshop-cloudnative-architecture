@@ -72,7 +72,7 @@ pipeline {
                             /p:Exclude="[Oragon.*.Tests]*"
 
                         dotnet sonarscanner begin \
-                            /o:"$SONARQUBE_USERNAME" \
+                            /o:luizcarlosfaria \
                             /k:"luizcarlosfaria_eshop-cloudnative-architecture" \
                             /d:sonar.login="$SONARQUBE_KEY" \
                             /d:sonar.host.url="https://sonarcloud.io" \
