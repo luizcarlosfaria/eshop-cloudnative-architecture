@@ -89,19 +89,19 @@ pipeline {
                     if (env.BRANCH_NAME.endsWith("-alpha")) {
 
                         for (int i = 0; i < projetcs.size(); ++i) {
-                            sh "dotnet pack ${projetcs[i]} --configuration Debug /p:PackageVersion=${BRANCH_NAME} --include-source --include-symbols --output ./output-packages"
+                            sh "dotnet pack ${projetcs[i]} --configuration Debug /p:PackageVersion=${BRANCH_NAME} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --output ./output-packages"
                         }
 
                     } else if (env.BRANCH_NAME.endsWith("-beta")) {
 
                         for (int i = 0; i < projetcs.size(); ++i) {
-                            sh "dotnet pack ${projetcs[i]} --configuration Release /p:PackageVersion=${BRANCH_NAME} --output ./output-packages"                        
+                            sh "dotnet pack ${projetcs[i]} --configuration Release /p:PackageVersion=${BRANCH_NAME} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --output ./output-packages"                        
                         }
 
                     } else {
 
                         for (int i = 0; i < projetcs.size(); ++i) {
-                            sh "dotnet pack ${projetcs[i]} --configuration Release /p:PackageVersion=${BRANCH_NAME} --output ./output-packages"                        
+                            sh "dotnet pack ${projetcs[i]} --configuration Release /p:PackageVersion=${BRANCH_NAME} -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg --output ./output-packages"                        
                         }
 
                     }
@@ -111,7 +111,9 @@ pipeline {
                         
                     withCredentials([usernamePassword(credentialsId: 'myget-eshop-cloud-native', passwordVariable: 'MYGET_KEY', usernameVariable: 'DUMMY' )]) {
 
-                        sh 'for pkg in ./output-packages/*.nupkg ; do dotnet nuget push "$pkg" -k "$MYGET_KEY" -s https://www.myget.org/F/eshop-cloud-native/api/v3/index.json -sk "$MYGET_KEY" -ss https://www.myget.org/F/eshop-cloud-native/api/v3/index.json ; done'
+                        sh 'for pkg in ./output-packages/*.nupkg ; do dotnet nuget push "$pkg" -k "$MYGET_KEY" -s https://www.myget.org/F/eshop-cloud-native/api/v3/index.json ; done'
+
+                        sh 'for pkg in ./output-packages/*.snupkg ; do dotnet nuget push "$pkg" "$MYGET_KEY" -Source https://www.myget.org/F/eshop-cloud-native/api/v3/index.json ; done'
 						
                     }
 
