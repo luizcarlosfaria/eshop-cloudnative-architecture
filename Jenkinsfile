@@ -113,7 +113,7 @@ pipeline {
 
                         sh 'for pkg in ./output-packages/*.nupkg ; do dotnet nuget push "$pkg" -k "$MYGET_KEY" -s https://www.myget.org/F/eshop-cloud-native/api/v3/index.json ; done'
 
-                        sh 'for pkg in ./output-packages/*.snupkg ; do dotnet nuget push "$pkg" -sk "$MYGET_KEY" -k "$MYGET_KEY" -s https://www.myget.org/F/eshop-cloud-native/api/v3/index.json -ss https://www.myget.org/F/eshop-cloud-native/api/v3/index.json ; done'
+                        sh 'for pkg in ./output-packages/*.snupkg ; do dotnet nuget push "$pkg" -k "$MYGET_KEY" -s https://www.myget.org/F/eshop-cloud-native/api/v3/index.json ; done'
 						
                     }
 
