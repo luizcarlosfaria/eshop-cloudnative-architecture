@@ -82,7 +82,7 @@ pipeline {
                 script{
 
                     def projetcs = [
-                        './OreShopCloudNative.Architecture.Bootstrap/eShopCloudNative.Architecture.Bootstrap.csproj'//,
+                        './eShopCloudNative.Architecture.Bootstrap/eShopCloudNative.Architecture.Bootstrap.csproj'//,
 						//'./eShopCloudNative.Architecture.Data/eShopCloudNative.Architecture.Data.csproj'
                     ]
 
