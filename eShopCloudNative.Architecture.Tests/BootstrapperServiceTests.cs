@@ -7,7 +7,7 @@ public class BootstrapperServiceTests
     [Fact]
     public void ConstructorTests()
     {
-        new BootstrapperService();
+        Assert.NotNull(new BootstrapperService());
     }
 
 
@@ -31,13 +31,15 @@ public class BootstrapperServiceTests
     [Fact]
     public async Task NullServiceItemTestsAsync()
     {
+        IBootstrapperService nullBootstrapperService = null;
+
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
             var bootstrapperService = new BootstrapperService()
             {
                 Services = new List<IBootstrapperService>()
                 {
-                    null,
+                    nullBootstrapperService,
                 }
             };
             await bootstrapperService.InitializeAsync(null);
@@ -49,7 +51,7 @@ public class BootstrapperServiceTests
             {
                 Services = new List<IBootstrapperService>()
                 {
-                    null,
+                    nullBootstrapperService,
                 }
             };
             await bootstrapperService.ExecuteAsync(null);
