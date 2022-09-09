@@ -67,7 +67,7 @@ pipeline {
 
         }
 
-        stage('Pack') {
+        stage('Pack and Publish') {
 
             agent {
                 dockerfile {
@@ -106,36 +106,14 @@ pipeline {
 
                     }
 
-                }
-
-            }
-
-        }
-
-        stage('Publish') {
-
-            agent {
-                dockerfile {
-                    // alwaysPull false
-                    // image 'microsoft/dotnet:2.2-sdk'
-                    // reuseNode false
-                    args '-u root:root'
-                }
-            }
-
-            when { buildingTag() }
-
-            steps {
-                
-                script {
                     
                     def publishOnNuGet = ( env.BRANCH_NAME.endsWith("-alpha") == false );
                         
-                        withCredentials([usernamePassword(credentialsId: 'myget-eshop-cloud-native', passwordVariable: 'MYGET_KEY', usernameVariable: 'DUMMY' )]) {
+                    withCredentials([usernamePassword(credentialsId: 'myget-eshop-cloud-native', passwordVariable: 'MYGET_KEY', usernameVariable: 'DUMMY' )]) {
 
                         sh 'for pkg in ./output-packages/*.nupkg ; do dotnet nuget push "$pkg" -k "$MYGET_KEY" -s https://www.myget.org/F/eshop-cloud-native/api/v3/index.json -ss https://www.myget.org/F/eshop-cloud-native/symbols/api/v2/package ; done'
 						
-                        }
+                    }
 
                     if (publishOnNuGet) {
 
