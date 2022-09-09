@@ -11,7 +11,7 @@
         <Company>gaGO.io | Cloud Native .NET</Company>
         <Product>eShopCloudNative</Product>
         <PackageProjectUrl>https://github.com/luizcarlosfaria/eshop-cloudnative/</PackageProjectUrl>
-        <PackageIcon>Oragon-Architecture-Penknife.export-150x150.png</PackageIcon>
+        <!--<PackageIcon>Oragon-Architecture-Penknife.export-150x150.png</PackageIcon>-->
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/luizcarlosfaria/eshop-cloudnative/</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
