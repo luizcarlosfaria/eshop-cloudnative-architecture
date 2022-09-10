@@ -13,7 +13,7 @@ namespace eShopCloudNative.Architecture.Bootstrap.Minio;
 public class MinioBootstrapperService : IBootstrapperService
 {
     public System.Net.NetworkCredential Credentials { get; set; }
-    
+
     public System.Net.DnsEndPoint ServerEndpoint { get; set; }
 
     public bool WithSSL { get; set; }
@@ -21,13 +21,12 @@ public class MinioBootstrapperService : IBootstrapperService
     public List<MinioBucket> BucketsToCreate { get; set; }
 
     private MinioClient minio;
-    private IConfiguration configuration;
 
-    public Task InitializeAsync(IConfiguration configuration)
+    public IConfiguration Configuration { get; set; }
+
+    public Task InitializeAsync()
     {
-        this.configuration = configuration;
-
-        if (configuration.GetValue<bool>("boostrap:minio"))
+        if (this.Configuration.GetValue<bool>("boostrap:minio"))
         {
             this.minio = this.BuildMinioClient();
         }
@@ -47,7 +46,7 @@ public class MinioBootstrapperService : IBootstrapperService
 
     public async Task ExecuteAsync()
     {
-        if (this.configuration.GetValue<bool>("boostrap:minio"))
+        if (this.Configuration.GetValue<bool>("boostrap:minio"))
         {
             List<Bucket> oldBuckets  = (await this.minio.ListBucketsAsync()).Buckets;
 

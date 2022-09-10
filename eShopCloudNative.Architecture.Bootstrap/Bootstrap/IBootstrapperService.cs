@@ -9,7 +9,7 @@ namespace eShopCloudNative.Architecture.Bootstrap;
 
 public interface IBootstrapperService
 {
-    Task InitializeAsync(IConfiguration configuration);
+    Task InitializeAsync();
 
     Task ExecuteAsync();
 

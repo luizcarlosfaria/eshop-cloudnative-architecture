@@ -17,7 +17,7 @@ public class BootstrapperServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
         {
             var bootstrapperService = new BootstrapperService();
-            await bootstrapperService.InitializeAsync(null);
+            await bootstrapperService.InitializeAsync();
         });
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
@@ -42,7 +42,7 @@ public class BootstrapperServiceTests
                     nullBootstrapperService,
                 }
             };
-            await bootstrapperService.InitializeAsync(null);
+            await bootstrapperService.InitializeAsync();
         });
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
@@ -72,10 +72,10 @@ public class BootstrapperServiceTests
                     mock.Object,
                 }
         };
-        await bootstrapperService.InitializeAsync(null);
+        await bootstrapperService.InitializeAsync();
+            
 
-
-        mock.Verify(m => m.InitializeAsync(null), Times.Once());
+        mock.Verify(m => m.InitializeAsync(), Times.Once());
 
         mock = new Mock<IBootstrapperService>();
 

@@ -34,4 +34,10 @@
     <ProjectReference Include="..\eShopCloudNative.Architecture.WebApi\eShopCloudNative.Architecture.WebApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="bootstrapper.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
