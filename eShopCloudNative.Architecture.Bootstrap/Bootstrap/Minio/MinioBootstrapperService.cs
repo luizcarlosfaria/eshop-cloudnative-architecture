@@ -21,23 +21,22 @@ public class MinioBootstrapperService : IBootstrapperService
     public List<MinioBucket> BucketsToCreate { get; set; }
 
     private MinioClient minio;
-    private List<Bucket> oldBuckets;
     private IConfiguration configuration;
 
-    public async Task InitializeAsync(IConfiguration configuration)
+    public Task InitializeAsync(IConfiguration configuration)
     {
         this.configuration = configuration;
 
         if (configuration.GetValue<bool>("boostrap:minio"))
         {
             this.minio = this.BuildMinioClient();
-
-            this.oldBuckets = (await this.minio.ListBucketsAsync()).Buckets;
         }
         else
         {
             //TODO: Logar dizendo que está ignorando
         }
+
+        return Task.CompletedTask;
     }
 
     private MinioClient BuildMinioClient() => new MinioClient()
@@ -50,6 +49,8 @@ public class MinioBootstrapperService : IBootstrapperService
     {
         if (this.configuration.GetValue<bool>("boostrap:minio"))
         {
+            List<Bucket> oldBuckets  = (await this.minio.ListBucketsAsync()).Buckets;
+
             foreach (var bucket in this.BucketsToCreate)
             {
                 if (oldBuckets.Any(it => it.Name == bucket.BucketName) == false)
