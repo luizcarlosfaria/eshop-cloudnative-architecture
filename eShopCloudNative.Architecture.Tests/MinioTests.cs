@@ -58,18 +58,5 @@ public class MinioTests
         Assert.Equal(key, publicPolicy.GetJsonPolicy());
     }
 
-    [Fact]
-    public void MinioBootstrapperServiceTests()
-    {
-        var staticPolicy = new StaticPolicy(){ PolicyText = "T" };
-        var publicPolicy = new PublicPolicy() { BucketName = Guid.NewGuid().ToString() };
-        var minioBucket = new MinioBucket(){ BucketName = "a", Policy = staticPolicy  };
-        var minioBootstrapperService = new MinioBootstrapperService()
-        {
-            BucketsToCreate = new List<MinioBucket>(){
-                minioBucket
-            }
-        };
-    }
 
 }
