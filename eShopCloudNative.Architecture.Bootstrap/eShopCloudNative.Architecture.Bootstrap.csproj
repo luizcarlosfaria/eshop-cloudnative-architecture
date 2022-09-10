@@ -3,7 +3,13 @@
     <Import Project="./../eShopCloudNative.Architecture.targets" />
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+        <PackageReference Include="Minio" Version="4.0.5" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\eShopCloudNative.Architecture\eShopCloudNative.Architecture.csproj" />
     </ItemGroup>
 
 </Project>

@@ -11,6 +11,6 @@ public interface IBootstrapperService
 {
     Task InitializeAsync(IConfiguration configuration);
 
-    Task ExecuteAsync(IConfiguration configuration);
+    Task ExecuteAsync();
 
 }

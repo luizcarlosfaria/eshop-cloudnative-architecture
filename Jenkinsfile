@@ -82,8 +82,8 @@ pipeline {
                 script{
 
                     def projetcs = [
-                        './eShopCloudNative.Architecture.Bootstrap/eShopCloudNative.Architecture.Bootstrap.csproj'//,
-						//'./eShopCloudNative.Architecture.Data/eShopCloudNative.Architecture.Data.csproj'
+						'./eShopCloudNative.Architecture/eShopCloudNative.Architecture.csproj',
+                        './eShopCloudNative.Architecture.Bootstrap/eShopCloudNative.Architecture.Bootstrap.csproj'
                     ]
 
                     if (env.BRANCH_NAME.endsWith("-alpha")) {

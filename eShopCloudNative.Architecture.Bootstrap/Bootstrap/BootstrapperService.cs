@@ -23,7 +23,7 @@ public class BootstrapperService : IBootstrapperService
         }
     }
 
-    public async Task ExecuteAsync(IConfiguration configuration)
+    public async Task ExecuteAsync()
     {
         if (this.Services == null) throw new InvalidOperationException("BootstrapperService.Services can't be null");
 
@@ -31,7 +31,7 @@ public class BootstrapperService : IBootstrapperService
         {
             if (service == null) throw new InvalidOperationException("A item of BootstrapperService.Services can't be null");
 
-            await service.ExecuteAsync(configuration);
+            await service.ExecuteAsync();
         }
     }
 
