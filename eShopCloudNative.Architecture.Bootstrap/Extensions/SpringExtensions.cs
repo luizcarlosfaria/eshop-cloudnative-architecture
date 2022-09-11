@@ -15,16 +15,18 @@ public static class SpringExtensions
 {
     public static CodeConfigApplicationContext RegisterInstance(this CodeConfigApplicationContext context, string name, object instance)
     {
-        var objectDefinition = new Spring.Objects.Factory.Support.GenericObjectDefinition();
-        objectDefinition.ObjectType = typeof(ObjectContainer);
+        var objectDefinition = new Spring.Objects.Factory.Support.GenericObjectDefinition
+        {
+            ObjectType = typeof(ObjectContainer),
+            FactoryMethodName = nameof(ObjectContainer.Define),
+            IsSingleton = true
+        };
         objectDefinition.ConstructorArgumentValues.AddNamedArgumentValue("instance", instance);
-        objectDefinition.FactoryMethodName = nameof(ObjectContainer.Define);
-        objectDefinition.IsSingleton = true;
         context.RegisterObjectDefinition(name, objectDefinition);
         return context;
     }
 
 
     public static XmlApplicationContext CreateChildContext(this CodeConfigApplicationContext context, params string[] configurationLocations)
-        => new XmlApplicationContext(context, configurationLocations);
+        => new(context, configurationLocations);
 }

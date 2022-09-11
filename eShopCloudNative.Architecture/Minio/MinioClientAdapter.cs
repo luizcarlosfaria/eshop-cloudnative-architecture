@@ -25,7 +25,7 @@ public interface IMinioClientAdapter
 [ExcludeFromCodeCoverage]
 public class MinioClientAdapter : IMinioClientAdapter
 {
-    private MinioClient minioClient;
+    private readonly MinioClient minioClient;
 
     public MinioClientAdapter(System.Net.DnsEndPoint serverEndpoint, System.Net.NetworkCredential credentials, bool withSSL)
     {
