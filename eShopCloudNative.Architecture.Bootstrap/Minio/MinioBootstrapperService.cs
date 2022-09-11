@@ -13,23 +13,17 @@ using System.Diagnostics.CodeAnalysis;
 namespace eShopCloudNative.Architecture.Minio;
 public class MinioBootstrapperService : IBootstrapperService
 {
-    public System.Net.NetworkCredential Credentials { get; set; }
-
-    public System.Net.DnsEndPoint ServerEndpoint { get; set; }
-
-    public bool WithSSL { get; set; }
-
     public List<MinioBucket> BucketsToCreate { get; set; }
 
     public IConfiguration Configuration { get; set; }
 
-    private IMinioClientAdapter minio;
+    public IMinioClientAdapter Minio { get; set; }
 
     public virtual Task InitializeAsync()
     {
         if (this.Configuration.GetValue<bool>("boostrap:minio"))
         {
-            this.minio = this.BuildMinioClient();
+            
         }
         else
         {
@@ -39,23 +33,20 @@ public class MinioBootstrapperService : IBootstrapperService
         return Task.CompletedTask;
     }
 
-    [ExcludeFromCodeCoverage]
-    protected virtual IMinioClientAdapter BuildMinioClient() => new MinioClientAdapter(this.ServerEndpoint, this.Credentials, this.WithSSL);
-
     public virtual async Task ExecuteAsync()
     {
         if (this.Configuration.GetValue<bool>("boostrap:minio"))
         {
-            List<Bucket> oldBuckets  = (await this.minio.ListBucketsAsync()).Buckets;
+            List<Bucket> oldBuckets  = (await this.Minio.ListBucketsAsync()).Buckets;
 
             foreach (var bucket in this.BucketsToCreate)
             {
                 if (oldBuckets.Any(it => it.Name == bucket.BucketName) == false)
                 {
-                    await this.minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucket.BucketName));
+                    await this.Minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucket.BucketName));
 
                     if (bucket.Policy != null)
-                        await this.minio.SetPolicyAsync(new SetPolicyArgs().WithBucket(bucket.BucketName).WithPolicy(bucket.Policy.GetJsonPolicy()));
+                        await this.Minio.SetPolicyAsync(new SetPolicyArgs().WithBucket(bucket.BucketName).WithPolicy(bucket.Policy.GetJsonPolicy()));
 
                 }
             }

@@ -26,17 +26,11 @@ public class MinioTests
             BucketsToCreate = new List<MinioBucket>(){
                 minioBucket
             },
-            Credentials = new NetworkCredential(),
-            ServerEndpoint = new DnsEndPoint("localhost", 22),
-            WithSSL = true
         };
 
         minioBucket.Policy.Should().NotBeNull();
         minioBucket.Policy.Should().Be(staticPolicy);
 
-        minioBootstrapperService.Credentials.Should().NotBeNull();
-        minioBootstrapperService.ServerEndpoint.Should().NotBeNull();
-        minioBootstrapperService.WithSSL.Should().BeTrue();
         minioBootstrapperService.BucketsToCreate.Should().HaveCount(1);
 
         minioBucket.BucketName.Should().Be("a");
@@ -74,10 +68,6 @@ public class MinioTests
     [Fact]
     public async Task MinioBootstrapperServiceNoStartTestsAsync()
     {
-        string login = "login";
-        string password = "password";
-        string host = "localhost";
-        int port = 22;
 
         var svc = new MinioBootstrapperServiceForTests()
         {
@@ -86,8 +76,6 @@ public class MinioTests
                     BucketName = "A"
                 }
             },
-            Credentials = new NetworkCredential(login, password),
-            ServerEndpoint = new DnsEndPoint(host, port),
         };
         svc.IConfigurationMock
             .Setup(it => it.GetSection("boostrap:minio"))
@@ -105,11 +93,6 @@ public class MinioTests
     [Fact]
     public async Task MinioBootstrapperServiceNoOldBucketsCreateBucketWithoutPolityTestsAsync()
     {
-        string login = "login";
-        string password = "password";
-        string host = "localhost";
-        int port = 22;
-
         var svc = new MinioBootstrapperServiceForTests()
         {
             BucketsToCreate = new List<MinioBucket>(){
@@ -117,8 +100,6 @@ public class MinioTests
                     BucketName = "A"
                 }
             },
-            Credentials = new NetworkCredential(login, password),
-            ServerEndpoint = new DnsEndPoint(host, port),
         };
         svc.IConfigurationMock
             .Setup(it => it.GetSection("boostrap:minio"))
@@ -150,11 +131,6 @@ public class MinioTests
     [Fact]
     public async Task MinioBootstrapperServiceHasOldBucketsEvictCreateBucketsTestsAsync()
     {
-        string login = "login";
-        string password = "password";
-        string host = "localhost";
-        int port = 22;
-
         var svc = new MinioBootstrapperServiceForTests()
         {
             BucketsToCreate = new List<MinioBucket>(){
@@ -162,8 +138,6 @@ public class MinioTests
                     BucketName = "A"
                 }
             },
-            Credentials = new NetworkCredential(login, password),
-            ServerEndpoint = new DnsEndPoint(host, port),
         };
         svc.IConfigurationMock
             .Setup(it => it.GetSection("boostrap:minio"))
@@ -195,11 +169,6 @@ public class MinioTests
     [Fact]
     public async Task MinioBootstrapperServiceNoOldBucketsCreateBucketWithPolityTestsAsync()
     {
-        string login = "login";
-        string password = "password";
-        string host = "localhost";
-        int port = 22;
-
         var svc = new MinioBootstrapperServiceForTests()
         {
             BucketsToCreate = new List<MinioBucket>(){
@@ -208,8 +177,6 @@ public class MinioTests
                     Policy = new StaticPolicy(){ PolicyText = "T" }
                 }
             },
-            Credentials = new NetworkCredential(login, password),
-            ServerEndpoint = new DnsEndPoint(host, port),
         };
         svc.IConfigurationMock
             .Setup(it => it.GetSection("boostrap:minio"))
@@ -253,14 +220,9 @@ public class MinioBootstrapperServiceForTests : MinioBootstrapperService
     public Mock<IMinioClientAdapter> IMinioClientAdapterMock { get; private set; }
     public Mock<IConfiguration> IConfigurationMock { get; private set; }
 
-    protected override IMinioClientAdapter BuildMinioClient()
-    {
-        
-        return this.IMinioClientAdapterMock.Object;
-    }
-
     public override Task InitializeAsync()
     {
+        this.Minio = this.IMinioClientAdapterMock.Object;
         this.Configuration = this.IConfigurationMock.Object;
 
         return base.InitializeAsync();

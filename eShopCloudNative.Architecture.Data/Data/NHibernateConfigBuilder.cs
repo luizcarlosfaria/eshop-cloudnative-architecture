@@ -10,7 +10,7 @@ public class NHibernateConfigBuilder
 {
     private readonly IServiceCollection services;
 
-    private List<Type> typesToFindMapping = new List<Type>();
+    private readonly List<Type> typesToFindMapping = new();
     private string schema;
     private string connectionStringKey;
     private bool registerSession = false;
