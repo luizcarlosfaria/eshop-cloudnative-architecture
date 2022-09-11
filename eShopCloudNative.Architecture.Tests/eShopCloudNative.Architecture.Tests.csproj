@@ -32,6 +32,7 @@
     <ProjectReference Include="..\eShopCloudNative.Architecture.Data\eShopCloudNative.Architecture.Data.csproj" />
     <ProjectReference Include="..\eShopCloudNative.Architecture.Messaging\eShopCloudNative.Architecture.Messaging.csproj" />
     <ProjectReference Include="..\eShopCloudNative.Architecture.WebApi\eShopCloudNative.Architecture.WebApi.csproj" />
+    <ProjectReference Include="..\eShopCloudNative.Architecture\eShopCloudNative.Architecture.csproj" />
   </ItemGroup>
 
   <ItemGroup>
