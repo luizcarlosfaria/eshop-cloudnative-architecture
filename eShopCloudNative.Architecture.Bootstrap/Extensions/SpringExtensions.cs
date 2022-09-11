@@ -7,14 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eShopCloudNative.Architecture.Bootstrap.Extensions;
+namespace eShopCloudNative.Architecture.Extensions;
 public static class SpringExtensions
 {
     public class ObjectContainer { public static object Define(object defined) => defined; }
 
     public static CodeConfigApplicationContext RegisterInstance(this CodeConfigApplicationContext context, string name, object instance)
     {
-        Spring.Objects.Factory.Support.GenericObjectDefinition objectDefinition = new Spring.Objects.Factory.Support.GenericObjectDefinition();
+        var objectDefinition = new Spring.Objects.Factory.Support.GenericObjectDefinition();
         objectDefinition.ObjectType = typeof(ObjectContainer);
         objectDefinition.ConstructorArgumentValues.AddNamedArgumentValue("defined", instance);
         objectDefinition.FactoryMethodName = "Define";
@@ -25,8 +25,5 @@ public static class SpringExtensions
 
 
     public static XmlApplicationContext CreateChildContext(this CodeConfigApplicationContext context, params string[] configurationLocations)
-    {
-        XmlApplicationContext childContext = new XmlApplicationContext(context, configurationLocations);
-        return childContext;
-    }
+        => new XmlApplicationContext(context, configurationLocations);
 }

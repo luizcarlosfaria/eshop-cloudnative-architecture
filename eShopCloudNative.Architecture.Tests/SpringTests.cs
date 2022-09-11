@@ -1,5 +1,6 @@
 ﻿using eShopCloudNative.Architecture.Bootstrap;
-using eShopCloudNative.Architecture.Bootstrap.Minio;
+using eShopCloudNative.Architecture.Extensions;
+using eShopCloudNative.Architecture.Minio;
 using Spring.Context.Support;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
-using static eShopCloudNative.Architecture.Bootstrap.Extensions.SpringExtensions;
+using static eShopCloudNative.Architecture.Extensions.SpringExtensions;
 
 namespace eShopCloudNative.Architecture.Tests;
 public class SpringTests

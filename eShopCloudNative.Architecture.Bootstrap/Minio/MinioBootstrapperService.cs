@@ -8,8 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using eShopCloudNative.Architecture.Extensions;
+using System.Diagnostics.CodeAnalysis;
 
-namespace eShopCloudNative.Architecture.Bootstrap.Minio;
+namespace eShopCloudNative.Architecture.Minio;
 public class MinioBootstrapperService : IBootstrapperService
 {
     public System.Net.NetworkCredential Credentials { get; set; }
@@ -20,11 +21,11 @@ public class MinioBootstrapperService : IBootstrapperService
 
     public List<MinioBucket> BucketsToCreate { get; set; }
 
-    private MinioClient minio;
-
     public IConfiguration Configuration { get; set; }
 
-    public Task InitializeAsync()
+    private IMinioClientAdapter minio;
+
+    public virtual Task InitializeAsync()
     {
         if (this.Configuration.GetValue<bool>("boostrap:minio"))
         {
@@ -38,13 +39,10 @@ public class MinioBootstrapperService : IBootstrapperService
         return Task.CompletedTask;
     }
 
-    private MinioClient BuildMinioClient() => new MinioClient()
-                        .WithEndpoint(this.ServerEndpoint.Host, this.ServerEndpoint.Port)
-                        .WithCredentials(this.Credentials.UserName, this.Credentials.Password)
-                        .If(it => this.WithSSL, it => it.WithSSL())
-                        .Build();
+    [ExcludeFromCodeCoverage]
+    protected virtual IMinioClientAdapter BuildMinioClient() => new MinioClientAdapter(this.ServerEndpoint, this.Credentials, this.WithSSL);
 
-    public async Task ExecuteAsync()
+    public virtual async Task ExecuteAsync()
     {
         if (this.Configuration.GetValue<bool>("boostrap:minio"))
         {
@@ -57,9 +55,7 @@ public class MinioBootstrapperService : IBootstrapperService
                     await this.minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucket.BucketName));
 
                     if (bucket.Policy != null)
-                    {
                         await this.minio.SetPolicyAsync(new SetPolicyArgs().WithBucket(bucket.BucketName).WithPolicy(bucket.Policy.GetJsonPolicy()));
-                    }
 
                 }
             }

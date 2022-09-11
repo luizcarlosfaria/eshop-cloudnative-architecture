@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eShopCloudNative.Architecture.Bootstrap.Minio;
+namespace eShopCloudNative.Architecture.Minio;
 public class StaticPolicy : IPolicy
 {
     public string PolicyText { get; set; }

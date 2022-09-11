@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ardalis.GuardClauses;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,9 @@ public static class Fluent
 {
     public static T If<T>(this T target, Func<T, bool> condition, Func<T, T> actionWhenTrue, Func<T, T> actionWhenFalse = null)
     {
-        if (condition == null) throw new ArgumentNullException(nameof(condition));
-        if (actionWhenTrue == null) throw new ArgumentNullException(nameof(actionWhenTrue));
-
+        Guard.Against.Null(condition, nameof(condition));
+        Guard.Against.Null(actionWhenTrue, nameof(actionWhenTrue));
+      
         if (target == null)
             return target;
 
@@ -27,8 +28,8 @@ public static class Fluent
 
     public static T If<T>(this T target, Func<T, bool> condition, Action<T> actionWhenTrue, Action<T> actionWhenFalse = null)
     {
-        if (condition == null) throw new ArgumentNullException(nameof(condition));
-        if (actionWhenTrue == null) throw new ArgumentNullException(nameof(actionWhenTrue));
+        Guard.Against.Null(condition, nameof(condition));
+        Guard.Against.Null(actionWhenTrue, nameof(actionWhenTrue));
 
         if (target == null)
             return target;

@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eShopCloudNative.Architecture.Bootstrap.Minio;
+namespace eShopCloudNative.Architecture.Minio;
 public class PublicPolicy : IPolicy
 {
     public string BucketName { get; set; }
 
-    public string GetJsonPolicy()  => 
+    public string GetJsonPolicy() =>
         string.IsNullOrWhiteSpace(this.BucketName)
-        ? throw new InvalidOperationException("BucketName is null") 
-        :  $@"{{
+        ? throw new InvalidOperationException("BucketName is null")
+        : $@"{{
                 ""Version"":""2012-10-17"",
                 ""Statement"":[
                     {{
