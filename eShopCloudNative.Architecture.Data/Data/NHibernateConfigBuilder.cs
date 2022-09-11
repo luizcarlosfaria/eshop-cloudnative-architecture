@@ -53,7 +53,7 @@ public class NHibernateConfigBuilder
 
     internal void Build()
     {
-        services.AddSingleton(sp =>
+        this.services.AddSingleton(sp =>
         {
             var aspnetConfiguration = sp.GetRequiredService<IConfiguration>();
 
@@ -61,7 +61,7 @@ public class NHibernateConfigBuilder
              .Configure(new NHibernate.Cfg.Configuration().SetNamingStrategy(PostgresNamingStragegy.Instance))
              .Database(
                  PostgreSQLConfiguration.PostgreSQL82
-                     .ConnectionString(aspnetConfiguration.GetConnectionString(connectionStringKey))
+                     .ConnectionString(aspnetConfiguration.GetConnectionString(this.connectionStringKey))
                      .ShowSql()
                      .DefaultSchema(this.schema)
                  )
@@ -77,8 +77,8 @@ public class NHibernateConfigBuilder
              .BuildSessionFactory();
 
         });
-        if (this.registerSession) services.AddSession();
-        if (this.registerStatelessSession) services.AddStatelessSession();
+        if (this.registerSession) this.services.AddSession();
+        if (this.registerStatelessSession) this.services.AddStatelessSession();
 
     }
 

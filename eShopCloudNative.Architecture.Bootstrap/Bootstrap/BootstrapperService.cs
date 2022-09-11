@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Ardalis.GuardClauses;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,11 @@ public class BootstrapperService : IBootstrapperService
 
     public async Task InitializeAsync()
     {
-        if (this.Services == null) throw new InvalidOperationException("BootstrapperService.Services can't be null");
+        Guard.Against.Null(this.Services, nameof(this.Services));
 
         foreach (var service in this.Services)
         {
-            if (service == null) throw new InvalidOperationException("A item of BootstrapperService.Services can't be null");
+            Guard.Against.Null(service, nameof(service));
 
             await service.InitializeAsync();
         }
@@ -25,11 +26,11 @@ public class BootstrapperService : IBootstrapperService
 
     public async Task ExecuteAsync()
     {
-        if (this.Services == null) throw new InvalidOperationException("BootstrapperService.Services can't be null");
+        Guard.Against.Null(this.Services, nameof(this.Services));
 
         foreach (var service in this.Services)
         {
-            if (service == null) throw new InvalidOperationException("A item of BootstrapperService.Services can't be null");
+            Guard.Against.Null(service, nameof(service));
 
             await service.ExecuteAsync();
         }

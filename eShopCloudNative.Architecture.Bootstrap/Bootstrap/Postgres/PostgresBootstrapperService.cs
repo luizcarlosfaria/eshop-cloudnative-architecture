@@ -10,6 +10,7 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 using Microsoft.Extensions.Configuration;
 using eShopCloudNative.Architecture.Bootstrap;
+using Ardalis.GuardClauses;
 
 namespace eShopCloudNative.Architecture.Bootstrap.Postgres;
 
@@ -30,27 +31,13 @@ public class PostgresBootstrapperService : IBootstrapperService
 
     public Task InitializeAsync()
     {
-        if (this.Configuration.GetValue<bool>("boostrap:postgres"))
-        {
-            if (this.SysAdminUser is null)
-                throw new InvalidOperationException("SysAdminUser can't be null");
+        Guard.Against.Null(this.SysAdminUser, nameof(this.SysAdminUser));
+        Guard.Against.Null(this.ServerEndpoint, nameof(this.ServerEndpoint));
+        Guard.Against.Null(this.AppUser, nameof(this.AppUser));
+        Guard.Against.Null(this.DatabaseToCreate, nameof(this.DatabaseToCreate));
+        Guard.Against.Null(this.InitialDatabase, nameof(this.InitialDatabase));
+        Guard.Against.Null(this.Configuration, nameof(this.Configuration));
 
-            if (this.ServerEndpoint is null)
-                throw new InvalidOperationException("ServerEndpoint can't be null");
-
-            if (this.AppUser is null)
-                throw new InvalidOperationException("AppUser can't be null");
-
-            if (this.DatabaseToCreate is null)
-                throw new InvalidOperationException("DatabaseToCreate can't be null");
-
-            if (this.InitialDatabase is null)
-                throw new InvalidOperationException("InitialDatabase can't be null");
-        }
-        else
-        {
-            //TODO: Logar dizendo que está ignorando
-        }
         return Task.CompletedTask;
     }
 

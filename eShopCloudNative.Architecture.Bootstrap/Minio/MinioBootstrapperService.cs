@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using eShopCloudNative.Architecture.Extensions;
 using System.Diagnostics.CodeAnalysis;
+using Ardalis.GuardClauses;
 
 namespace eShopCloudNative.Architecture.Minio;
 public class MinioBootstrapperService : IBootstrapperService
@@ -21,14 +22,9 @@ public class MinioBootstrapperService : IBootstrapperService
 
     public virtual Task InitializeAsync()
     {
-        if (this.Configuration.GetValue<bool>("boostrap:minio"))
-        {
-            
-        }
-        else
-        {
-            //TODO: Logar dizendo que está ignorando
-        }
+        Guard.Against.Null(this.Configuration, nameof(this.Configuration));
+        Guard.Against.Null(this.Minio, nameof(this.Minio));
+        Guard.Against.NullOrEmpty(this.BucketsToCreate, nameof(this.BucketsToCreate));
 
         return Task.CompletedTask;
     }

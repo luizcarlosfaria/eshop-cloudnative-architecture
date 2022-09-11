@@ -14,6 +14,9 @@ using static eShopCloudNative.Architecture.Extensions.SpringExtensions;
 namespace eShopCloudNative.Architecture.Tests;
 public class Extensions_IF_Tests
 {
+
+
+
     [Fact]
     public void FluentIfTrueTests()
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Ardalis.GuardClauses;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,16 @@ namespace eShopCloudNative.Architecture.Extensions;
 public static class ConfigurationExtensions
 {
     public static T CreateInstanceAndConfigure<T>(this IConfiguration configuration, string key)
-        => configuration.ConfigureWith(key, Activator.CreateInstance<T>());
+     {
+        Guard.Against.Null(configuration, nameof(configuration));
+        Guard.Against.NullOrWhiteSpace(key, nameof(key));
+        return configuration.ConfigureWith(key, Activator.CreateInstance<T>());;
+    }
 
-    public static T ConfigureWith<T>(this IConfiguration configuration, string key, T item)
+public static T ConfigureWith<T>(this IConfiguration configuration, string key, T item)
     {
+        Guard.Against.Null(configuration, nameof(configuration));
+        Guard.Against.NullOrWhiteSpace(key, nameof(key));
         configuration.Bind(key, item);
         return item;
     }
