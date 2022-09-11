@@ -3,7 +3,14 @@
     <Import Project="./../eShopCloudNative.Architecture.targets" />
 
     <ItemGroup>
-        <Folder Include="Data\" />
+        <PackageReference Include="FluentMigrator" Version="3.3.2" />
+        <PackageReference Include="FluentNHibernate" Version="3.1.0" />
+        <PackageReference Include="NHibernate" Version="5.3.12" />
+        <PackageReference Include="Npgsql" Version="6.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\eShopCloudNative.Architecture\eShopCloudNative.Architecture.csproj" />
     </ItemGroup>
 
 </Project>

@@ -6,4 +6,8 @@
       <Folder Include="WebApi\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\eShopCloudNative.Architecture\eShopCloudNative.Architecture.csproj" />
+    </ItemGroup>
+
 </Project>
