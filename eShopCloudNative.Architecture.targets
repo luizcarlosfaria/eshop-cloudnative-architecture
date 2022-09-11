@@ -10,11 +10,20 @@
         <Authors>luizcarlosfaria</Authors>
         <Company>gaGO.io | Cloud Native .NET</Company>
         <Product>eShopCloudNative</Product>
-        <PackageProjectUrl>https://github.com/luizcarlosfaria/eshop-cloudnative/</PackageProjectUrl>
-        <!--<PackageIcon>Oragon-Architecture-Penknife.export-150x150.png</PackageIcon>-->
+        <PackageProjectUrl>https://cloudnative.net.br/</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
         <!--<PackageReadmeFile>README.md</PackageReadmeFile>-->
         <RepositoryUrl>https://github.com/luizcarlosfaria/eshop-cloudnative/</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <Version>0.0.6-alpha</Version>
+        <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     </PropertyGroup>
+
+
+    <ItemGroup>
+        <None Include="..\icon.png">
+            <Pack>True</Pack>
+            <PackagePath>\</PackagePath>
+        </None>
+    </ItemGroup>
 </Project>
