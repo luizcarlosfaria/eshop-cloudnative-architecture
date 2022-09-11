@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace eShopCloudNative.Architecture.Extensions;
-public static class Fluent
+public static class FluentExtensions
 {
     public static T If<T>(this T target, Func<T, bool> condition, Func<T, T> actionWhenTrue, Func<T, T> actionWhenFalse = null)
     {

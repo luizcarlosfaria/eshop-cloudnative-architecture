@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace eShopCloudNative.Architecture.Bootstrap;
-public class BootstrapperService : IBootstrapperService
+public class BootstrapperService : IBootstrapperService, IHostedService
 {
-
     public List<IBootstrapperService> Services { get; set; }
 
     public async Task InitializeAsync()
@@ -36,4 +36,12 @@ public class BootstrapperService : IBootstrapperService
         }
     }
 
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        await this.InitializeAsync();
+        await this.ExecuteAsync();
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+    
 }
