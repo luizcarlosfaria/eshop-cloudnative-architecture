@@ -8,16 +8,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace eShopCloudNative.Architecture.Extensions;
+
+public static class ObjectContainer { public static object Define(object instance) => instance; }
+
 public static class SpringExtensions
 {
-    public class ObjectContainer { public static object Define(object defined) => defined; }
-
     public static CodeConfigApplicationContext RegisterInstance(this CodeConfigApplicationContext context, string name, object instance)
     {
         var objectDefinition = new Spring.Objects.Factory.Support.GenericObjectDefinition();
         objectDefinition.ObjectType = typeof(ObjectContainer);
-        objectDefinition.ConstructorArgumentValues.AddNamedArgumentValue("defined", instance);
-        objectDefinition.FactoryMethodName = "Define";
+        objectDefinition.ConstructorArgumentValues.AddNamedArgumentValue("instance", instance);
+        objectDefinition.FactoryMethodName = nameof(ObjectContainer.Define);
         objectDefinition.IsSingleton = true;
         context.RegisterObjectDefinition(name, objectDefinition);
         return context;
