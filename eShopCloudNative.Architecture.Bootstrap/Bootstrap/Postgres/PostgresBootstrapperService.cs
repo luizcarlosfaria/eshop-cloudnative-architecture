@@ -18,19 +18,19 @@ namespace eShopCloudNative.Architecture.Bootstrap.Postgres;
 public class PostgresBootstrapperService : IBootstrapperService
 {
     public System.Net.NetworkCredential SysAdminUser { get; set; }
-    
+
     public System.Net.DnsEndPoint ServerEndpoint { get; set; }
-    
+
     public System.Net.NetworkCredential AppUser { get; set; }
-    
+
     public string DatabaseToCreate { get; set; }
-    
+
     public string InitialDatabase { get; set; }
-    
+
     public string SchemaToSetPermissions { get; set; }
-    
+
     public IConfiguration Configuration { get; set; }
-    
+
     public Type MigrationType { get; set; }
 
     public Task InitializeAsync()
@@ -53,7 +53,7 @@ public class PostgresBootstrapperService : IBootstrapperService
         return Task.CompletedTask;
     }
 
-    
+
 
     public Task ExecuteAsync()
     {
@@ -70,11 +70,6 @@ public class PostgresBootstrapperService : IBootstrapperService
             databaseConnection.Open();
             this.SetPermissions(databaseConnection);
         }
-        else
-        {
-            //TODO: Logar dizendo que está ignorando
-        }
-
         return Task.CompletedTask;
     }
 
@@ -138,10 +133,10 @@ public class PostgresBootstrapperService : IBootstrapperService
 
     }
 
-    protected virtual IDbConnection BuildConnection(string connectionString) 
+    protected virtual IDbConnection BuildConnection(string connectionString)
         => new NpgsqlConnection(connectionString);
 
-    protected virtual string BuildConnectionString(string database, System.Net.NetworkCredential credential) 
+    protected virtual string BuildConnectionString(string database, System.Net.NetworkCredential credential)
         => $"server={this.ServerEndpoint?.Host ?? "localhost"};Port={this.ServerEndpoint?.Port};Database={database};User Id={credential.UserName};Password={credential.Password};";
 
     private void ApplyMigrations()

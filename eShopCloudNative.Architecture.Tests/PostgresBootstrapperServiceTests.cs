@@ -110,6 +110,47 @@ public class PostgresBootstrapperServiceTests
 
     }
 
+
+    [Fact]
+    public async Task CompleteFlow()
+    {
+        IConfiguration configurationInstance = BuildConfiguration();
+
+        var migrationType = this.GetType();
+
+        var svc = new PostgresTestService()
+        {
+            SysAdminUser = new System.Net.NetworkCredential(){ UserName = "a", Password = "b" },
+            ServerEndpoint = new System.Net.DnsEndPoint("127.00.0.1", 1),
+            AppUser = new System.Net.NetworkCredential() { UserName = "a", Password = "b" },
+            DatabaseToCreate = "DatabaseToCreate",
+            InitialDatabase = "InitialDatabase",
+            SchemaToSetPermissions = "SchemaToSetPermissions",
+            Configuration = configurationInstance,
+            //MigrationType = migrationType,
+        };
+
+        var createAppUserIDbCommandMock = new Mock<IDbCommand>();
+        createAppUserIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0l);
+
+        var createDatabaseIDbCommandMock = new Mock<IDbCommand>();
+        createDatabaseIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0l);
+
+        var setPermissionsIDbCommandMock = new Mock<IDbCommand>();
+
+        svc.DbConnectionMock.SetupSequence(it => it.CreateCommand())
+            .Returns(createAppUserIDbCommandMock.Object)
+            .Returns(createDatabaseIDbCommandMock.Object)
+            .Returns(setPermissionsIDbCommandMock.Object);
+
+        await svc.ExecuteAsync();
+
+        createAppUserIDbCommandMock.Verify(it => it.ExecuteNonQuery(), Times.Once());
+        createDatabaseIDbCommandMock.Verify(it => it.ExecuteNonQuery(), Times.Once());
+        setPermissionsIDbCommandMock.Verify(it => it.ExecuteNonQuery(), Times.Exactly(2));
+
+    }
+
     private static IConfiguration BuildConfiguration()
     {
         var configurationMock = new Mock<IConfiguration>();
