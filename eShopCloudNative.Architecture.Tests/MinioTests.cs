@@ -62,6 +62,7 @@ public class MinioTests
 
         StaticPolicy publicPolicy = new StaticPolicy(){ PolicyText = key };
 
+        Assert.Equal(key, publicPolicy.PolicyText);
         Assert.Equal(key, publicPolicy.GetJsonPolicy());
     }
 
@@ -91,7 +92,7 @@ public class MinioTests
     }
 
     [Fact]
-    public async Task MinioBootstrapperServiceNoOldBucketsCreateBucketWithoutPolityTestsAsync()
+    public async Task MinioBootstrapperServiceNoOldBucketsCreateBucketWithoutPolicyTestsAsync()
     {
         var svc = new MinioBootstrapperServiceForTests()
         {
@@ -167,7 +168,7 @@ public class MinioTests
     }
 
     [Fact]
-    public async Task MinioBootstrapperServiceNoOldBucketsCreateBucketWithPolityTestsAsync()
+    public async Task MinioBootstrapperServiceNoOldBucketsCreateBucketWithPolicyTestsAsync()
     {
         var svc = new MinioBootstrapperServiceForTests()
         {

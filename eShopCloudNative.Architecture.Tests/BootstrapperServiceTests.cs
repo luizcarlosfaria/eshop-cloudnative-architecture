@@ -1,4 +1,5 @@
 using eShopCloudNative.Architecture.Bootstrap;
+using Microsoft.Extensions.Hosting;
 
 namespace eShopCloudNative.Architecture.Tests;
 
@@ -91,5 +92,25 @@ public class BootstrapperServiceTests
 
 
         mock.Verify(m => m.ExecuteAsync(), Times.Once());
+    }
+
+    [Fact]
+    public async Task HostedServiceTestsAsync()
+    {
+        var mock = new Mock<IBootstrapperService>();
+
+        IHostedService bootstrapperService = new BootstrapperService()
+        {
+            Services = new List<IBootstrapperService>()
+                {
+                    mock.Object,
+                }
+        };
+        await bootstrapperService.StartAsync(CancellationToken.None);
+
+        mock.Verify(m => m.InitializeAsync(), Times.Once());
+        mock.Verify(m => m.ExecuteAsync(), Times.Once());
+
+        await bootstrapperService.StopAsync(CancellationToken.None);
     }
 }

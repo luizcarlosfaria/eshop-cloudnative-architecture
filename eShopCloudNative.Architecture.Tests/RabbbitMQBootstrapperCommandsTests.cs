@@ -56,7 +56,7 @@ public class RabbbitMQBootstrapperCommandsTests
     }
 
     [Fact]
-    public async Task ExchangeBindCommandExecutionAsync()
+    public void ExchangeBindCommandExecution()
     {
         var modelMock = new Mock<IModel>();
 
@@ -68,15 +68,14 @@ public class RabbbitMQBootstrapperCommandsTests
             Arguments = null,
         };
 
-        var svc = this.Build(modelMock, command);
-
-        await svc.ExecuteAsync();
+        command.Prepare();
+        command.Execute(modelMock.Object);
 
         modelMock.Verify(it => it.ExchangeBind("destination", "source", "routingKey", null), Times.Once());
     }
 
     [Fact]
-    public async Task ExchangeDeclareCommandExecutionAsync()
+    public void ExchangeDeclareCommandExecution()
     {
         var modelMock = new Mock<IModel>();
 
@@ -89,15 +88,14 @@ public class RabbbitMQBootstrapperCommandsTests
             Arguments = null,
         };
 
-        var svc = this.Build(modelMock, command);
-
-        await svc.ExecuteAsync();
+        command.Prepare();
+        command.Execute(modelMock.Object);
 
         modelMock.Verify(it => it.ExchangeDeclare("Exchange", "Type", true, true, null), Times.Once());
     }
 
     [Fact]
-    public async Task QueueBindCommandExecutionAsync()
+    public void QueueBindCommandExecution()
     {
         var modelMock = new Mock<IModel>();
 
@@ -108,16 +106,15 @@ public class RabbbitMQBootstrapperCommandsTests
             RoutingKey = "RoutingKey",
             Arguments = null,
         };
-        
-        var svc = this.Build(modelMock, command);
 
-        await svc.ExecuteAsync();
+        command.Prepare();
+        command.Execute(modelMock.Object);
 
         modelMock.Verify(it => it.QueueBind("Queue", "Exchange", "RoutingKey", null), Times.Once());
     }
 
     [Fact]
-    public async Task QueueDecalreCommandExecutionAsync()
+    public void QueueDecalreCommandExecution()
     {
         var modelMock = new Mock<IModel>();
 
@@ -129,12 +126,10 @@ public class RabbbitMQBootstrapperCommandsTests
             AutoDelete = true,
             Arguments = null,
         };
-
-        var svc = this.Build(modelMock, command);
-
-        await svc.ExecuteAsync();
+        
+        command.Prepare();
+        command.Execute(modelMock.Object);
 
         modelMock.Verify(it => it.QueueDeclare("Queue", true, true, true, null), Times.Once());
     }
-
 }
