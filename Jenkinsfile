@@ -5,6 +5,15 @@ pipeline {
     environment {
         COMPOSE_PROJECT_NAME = "${env.JOB_NAME}-${env.BUILD_ID}"
     }
+
+    options {
+      throttleJobProperty(
+          categories: ['eshop'],
+          throttleEnabled: true,
+          throttleOption: 'category'
+      )
+    }
+
     stages {
       
         stage('Build') {
