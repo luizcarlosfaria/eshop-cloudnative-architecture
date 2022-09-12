@@ -240,10 +240,9 @@ public class FakeIConfigurationSection : IConfigurationSection
 
     public string Value { get; set; }
 
-    public IEnumerable<IConfigurationSection> GetChildren()
-    {
-        throw new NotImplementedException();
-    }
+    public List<IConfigurationSection> FakeChildren { get; set; }
+
+    public IEnumerable<IConfigurationSection> GetChildren() => this.FakeChildren;
 
     public IChangeToken GetReloadToken()
     {
@@ -252,6 +251,6 @@ public class FakeIConfigurationSection : IConfigurationSection
 
     public IConfigurationSection GetSection(string key)
     {
-        throw new NotImplementedException();
+        return this.FakeChildren?.Where(it => it.Key == key).SingleOrDefault() ?? null;
     }
 }
