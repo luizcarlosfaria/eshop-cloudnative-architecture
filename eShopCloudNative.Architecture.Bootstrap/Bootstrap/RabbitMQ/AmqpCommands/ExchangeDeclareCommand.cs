@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Ardalis.GuardClauses;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,14 @@ public class ExchangeDeclareCommand : IAmqpCommand
     public bool AutoDelete { get; set; }
     public IDictionary<string, object> Arguments { get; set; }
 
-    public void Prepare() { }
+    public void Prepare()
+    {
+        Guard.Against.NullOrEmpty(this.Exchange);
+        Guard.Against.NullOrEmpty(this.Type);
+    }
 
     public void Execute(IModel model)
-        => model.ExchangeDeclare(exchange: this.Exchange, type: this.Type, durable: this.Durable, autoDelete: this.AutoDelete, arguments: this.Arguments);
+        => Guard.Against.Null(model)
+        .ExchangeDeclare(exchange: this.Exchange, type: this.Type, durable: this.Durable, autoDelete: this.AutoDelete, arguments: this.Arguments);
 
 }

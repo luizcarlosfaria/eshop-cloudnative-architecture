@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Ardalis.GuardClauses;
+using RabbitMQ.Client;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,10 +15,16 @@ public class QueueBindCommand : IAmqpCommand
     public string RoutingKey { get; set; }
     public IDictionary<string, object> Arguments { get; set; }
 
-    public void Prepare() { }
+    public void Prepare()
+    {
+        Guard.Against.NullOrEmpty(this.Queue);
+        Guard.Against.NullOrEmpty(this.Exchange);
+        Guard.Against.Null(this.RoutingKey);
+    }
 
     public void Execute(IModel model)
-        => model.QueueBind(queue: this.Queue, exchange: this.Exchange, routingKey: this.RoutingKey, arguments: this.Arguments);
+        => Guard.Against.Null(model)
+        .QueueBind(queue: this.Queue, exchange: this.Exchange, routingKey: this.RoutingKey, arguments: this.Arguments);
 
 
 }

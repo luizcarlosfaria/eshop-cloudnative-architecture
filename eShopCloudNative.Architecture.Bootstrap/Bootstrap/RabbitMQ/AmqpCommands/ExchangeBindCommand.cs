@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Ardalis.GuardClauses;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +16,14 @@ public class ExchangeBindCommand : IAmqpCommand
 
     public void Prepare()
     {
+        Guard.Against.NullOrEmpty(this.Destination);
+        Guard.Against.NullOrEmpty(this.Source);
+        Guard.Against.Null(this.RoutingKey);
     }
 
     public void Execute(IModel model)
-        => model.ExchangeBind(destination: this.Destination, source: this.Source, routingKey: this.RoutingKey, arguments: this.Arguments);
+        => Guard.Against.Null(model)
+        .ExchangeBind(destination: this.Destination, source: this.Source, routingKey: this.RoutingKey, arguments: this.Arguments);
 
 
 }
