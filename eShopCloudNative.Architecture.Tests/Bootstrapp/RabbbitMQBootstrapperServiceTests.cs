@@ -1,47 +1,12 @@
-﻿using eShopCloudNative.Architecture.Bootstrap;
-using eShopCloudNative.Architecture.Bootstrap.RabbitMQ;
+﻿using eShopCloudNative.Architecture.Bootstrap.RabbitMQ;
 using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AdminCommands;
 using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AmqpCommands;
-using eShopCloudNative.Architecture.Extensions;
-using eShopCloudNative.Architecture.Minio;
 using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
-using Spring.Context.Support;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
-using System.Text;
-using System.Threading.Tasks;
-using static eShopCloudNative.Architecture.Extensions.SpringExtensions;
 
-namespace eShopCloudNative.Architecture.Tests;
+namespace eShopCloudNative.Architecture.Tests.Bootstrapp;
 public class RabbbitMQBootstrapperServiceTests
 {
-
-    [Fact]
-    public void RabbbitMQBootstrapperServiceBossalities()
-    {
-        var configurationMock = new Mock<IConfiguration>();
-        var configurationInstance = configurationMock.Object;
-
-        var connectionFactoryMock = new Mock<IConnectionFactory>();
-        var connectionFactoryInstance = connectionFactoryMock.Object;
-
-        var listMock = new Mock<IList<IRabbitMQCommand>>();
-        var listInstance = listMock.Object;
-
-
-        var src = new RabbbitMQBootstrapperService()
-        {
-            Configuration = configurationInstance ,
-            ConnectionFactory = connectionFactoryInstance,
-            Commands = listInstance,
-        };
-        src.Configuration.Should().Be(configurationInstance);
-        src.ConnectionFactory.Should().Be(connectionFactoryInstance);
-        src.Commands.Should().BeSameAs(listInstance);
-    }
 
     [Fact]
     public async Task RabbbitMQBootstrapperServiceInitializeValidationsAsync()
@@ -58,7 +23,7 @@ public class RabbbitMQBootstrapperServiceTests
         var src0 = new RabbbitMQBootstrapperService()
         {
             Configuration = configurationInstance ,
-            ConnectionFactory = connectionFactoryInstance,
+            AmqpConnectionFactory = connectionFactoryInstance,
             Commands = new List<IRabbitMQCommand>(){ new Mock<IRabbitMQCommand>().Object },
         };
         await src0.InitializeAsync();
@@ -66,7 +31,7 @@ public class RabbbitMQBootstrapperServiceTests
         var src1 = new RabbbitMQBootstrapperService()
         {
             Configuration = null ,
-            ConnectionFactory = connectionFactoryInstance,
+            AmqpConnectionFactory = connectionFactoryInstance,
             Commands = listInstance,
         };
         await Assert.ThrowsAsync<ArgumentNullException>(() => src1.InitializeAsync());
@@ -74,15 +39,15 @@ public class RabbbitMQBootstrapperServiceTests
         var src2 = new RabbbitMQBootstrapperService()
         {
             Configuration = configurationInstance ,
-            ConnectionFactory = null,
+            AmqpConnectionFactory = null,
             Commands = listInstance,
         };
-        await Assert.ThrowsAsync<ArgumentNullException>(() => src2.InitializeAsync());
+        await Assert.ThrowsAsync<ArgumentException>(() => src2.InitializeAsync());
 
         var src3 = new RabbbitMQBootstrapperService()
         {
             Configuration = configurationInstance ,
-            ConnectionFactory = connectionFactoryInstance,
+            AmqpConnectionFactory = connectionFactoryInstance,
             Commands = null,
         };
         await Assert.ThrowsAsync<ArgumentNullException>(() => src3.InitializeAsync());
@@ -122,7 +87,7 @@ public class RabbbitMQBootstrapperServiceTests
         var src1 = new RabbbitMQBootstrapperService()
         {
             Configuration = configurationInstance ,
-            ConnectionFactory = connectionFactoryInstance,
+            AmqpConnectionFactory = connectionFactoryInstance,
             Commands = listInstance,
         };
         await Assert.ThrowsAsync<NotSupportedException>(() => src1.ExecuteAsync());
@@ -160,8 +125,10 @@ public class RabbbitMQBootstrapperServiceTests
         var src1 = new RabbbitMQBootstrapperService()
         {
             Configuration = configurationInstance ,
-            ConnectionFactory = connectionFactoryInstance,
+            AmqpConnectionFactory = connectionFactoryInstance,
             Commands = listInstance,
+            HttpUri = "http://localhost:15672",
+            HttpApiCredentials= new System.Net.NetworkCredential("u","p")
         };
         await src1.ExecuteAsync();
 
@@ -203,14 +170,17 @@ public class RabbbitMQBootstrapperServiceTests
         var src1 = new RabbbitMQBootstrapperService()
         {
             Configuration = configurationInstance ,
-            ConnectionFactory = connectionFactoryInstance,
+            AmqpConnectionFactory = connectionFactoryInstance,
             Commands = listInstance,
+            HttpUri = "http://localhost:15672",
+            HttpApiCredentials= new System.Net.NetworkCredential("u","p")
         };
         await src1.ExecuteAsync();
 
         commandMock.Verify(it => it.PrepareAsync(), Times.Once());
-        commandMock.Verify(it => it.ExecuteAsync(modelInstance), Times.Once());
+        commandMock.Verify(it => it.ExecuteAsync(It.IsNotNull<IRabbitMQAdminAPI>()), Times.Once());
 
     }
 
 }
+

@@ -7,24 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eShopCloudNative.Architecture.Tests;
+namespace eShopCloudNative.Architecture.Tests.Bootstrapp;
 public class PostgresBootstrapperServiceTests
 {
-    /*
-     public System.Net.NetworkCredential SysAdminUser { get; set; }
-    public System.Net.DnsEndPoint ServerEndpoint { get; set; }
-    public System.Net.NetworkCredential AppUser { get; set; }
-    public string DatabaseToCreate { get; set; }
-    public string InitialDatabase { get; set; }
-
-    public string SchemaToSetPermissions { get; set; }
-
-
-    public IConfiguration Configuration { get; set; }
-
-    public Type MigrationType { get; set; }
-     */
-
     [Fact]
     public async Task PostgresBootstrapperServiceBossalitiesAsync()
     {
@@ -90,10 +75,10 @@ public class PostgresBootstrapperServiceTests
         };
 
         var createAppUserIDbCommandMock = new Mock<IDbCommand>();
-        createAppUserIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(1l);
+        createAppUserIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(1L);
 
         var createDatabaseIDbCommandMock = new Mock<IDbCommand>();
-        createDatabaseIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(1l);
+        createDatabaseIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(1L);
 
         var setPermissionsIDbCommandMock = new Mock<IDbCommand>();
 
@@ -131,10 +116,10 @@ public class PostgresBootstrapperServiceTests
         };
 
         var createAppUserIDbCommandMock = new Mock<IDbCommand>();
-        createAppUserIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0l);
+        createAppUserIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0L);
 
         var createDatabaseIDbCommandMock = new Mock<IDbCommand>();
-        createDatabaseIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0l);
+        createDatabaseIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0L);
 
         var setPermissionsIDbCommandMock = new Mock<IDbCommand>();
 

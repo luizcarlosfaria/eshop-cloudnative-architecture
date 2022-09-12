@@ -1,4 +1,5 @@
 ﻿using eShopCloudNative.Architecture.Extensions;
+using eShopCloudNative.Architecture.Tests.Bootstrapp;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;

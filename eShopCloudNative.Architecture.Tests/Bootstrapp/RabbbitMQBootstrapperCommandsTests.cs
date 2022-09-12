@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static eShopCloudNative.Architecture.Extensions.SpringExtensions;
 
-namespace eShopCloudNative.Architecture.Tests;
+namespace eShopCloudNative.Architecture.Tests.Bootstrapp;
 public class RabbbitMQBootstrapperCommandsTests
 {
     private RabbbitMQBootstrapperService Build(Mock<IModel> modelMock, IRabbitMQCommand command)
@@ -49,7 +49,7 @@ public class RabbbitMQBootstrapperCommandsTests
         return new RabbbitMQBootstrapperService()
         {
             Configuration = configurationInstance,
-            ConnectionFactory = connectionFactoryInstance,
+            AmqpConnectionFactory = connectionFactoryInstance,
             Commands = listInstance,
         };
 
@@ -126,10 +126,85 @@ public class RabbbitMQBootstrapperCommandsTests
             AutoDelete = true,
             Arguments = null,
         };
-        
+
         command.Prepare();
         command.Execute(modelMock.Object);
 
         modelMock.Verify(it => it.QueueDeclare("Queue", true, true, true, null), Times.Once());
     }
+
+    [Fact]
+    public async Task CreateUserCommandSucessAsync()
+    {
+        var modelMock = new Mock<IRabbitMQAdminAPI>();
+
+        var command = new CreateUserCommand()
+        {
+            Credential = new System.Net.NetworkCredential("u", "p"),
+            Tags = "administrator",
+        };
+
+        await command.PrepareAsync();
+        await command.ExecuteAsync(modelMock.Object);
+
+        modelMock.Verify(it => it.CreateUserAsync("u", It.Is<CreateUserRequest>(it => it.Password == "p" && it.Tags == "administrator")), Times.Once());
+    }
+
+    [Fact]
+    public async Task CreateVhostCommandSucessAsync()
+    {
+        var modelMock = new Mock<IRabbitMQAdminAPI>();
+
+        var command = new CreateVhostCommand()
+        {
+            Name = "a"
+        };
+
+        await command.PrepareAsync();
+        await command.ExecuteAsync(modelMock.Object);
+
+        modelMock.Verify(it => it.CreateVirtualHostAsync("a"), Times.Once());
+    }
+
+    [Fact]
+    public async Task SetUserPermissionCommandSucessAsync()
+    {
+        var modelMock = new Mock<IRabbitMQAdminAPI>();
+
+        var command = new SetUserPermissionCommand()
+        {
+            Vhost = "Vhost",
+            UserName = "UserName",
+            ConfigurePattern = "ConfigurePattern",
+            WritePattern = "WritePattern",
+            ReadPattern = "ReadPattern"
+        };
+
+        await command.PrepareAsync();
+        await command.ExecuteAsync(modelMock.Object);
+
+        modelMock.Verify(it => it.SetUserVirtualHostPermissionsAsync(
+            nameof (SetUserPermissionCommand.Vhost),
+            nameof(SetUserPermissionCommand.UserName),
+            It.Is<VhostPermission>(
+                it => it.Configure == nameof(SetUserPermissionCommand.ConfigurePattern)
+                && it.Write == nameof(SetUserPermissionCommand.WritePattern)
+                && it.Read == nameof(SetUserPermissionCommand.ReadPattern)
+            )
+            ), Times.Once());
+    }
+
+    [Fact]
+    public void VhostPermissionTest()
+    {
+        new VhostPermission().ConfitgureAll().Configure.Should().Be(".*");
+        new VhostPermission().WriteAll().Write.Should().Be(".*");
+        new VhostPermission().ReadAll().Read.Should().Be(".*");
+
+        var full = new VhostPermission().FullAccessAll();
+        full.Configure.Should().Be(".*");
+        full.Write.Should().Be(".*");
+        full.Write.Should().Be(".*");
+    }
+
 }

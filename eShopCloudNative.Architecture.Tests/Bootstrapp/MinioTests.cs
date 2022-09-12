@@ -1,7 +1,6 @@
 ﻿using eShopCloudNative.Architecture.Bootstrap;
 using eShopCloudNative.Architecture.Minio;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
 using Minio;
 using Minio.DataModel;
 using System;
@@ -12,7 +11,7 @@ using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eShopCloudNative.Architecture.Tests;
+namespace eShopCloudNative.Architecture.Tests.Bootstrapp;
 public class MinioTests
 {
     [Fact]
@@ -43,7 +42,7 @@ public class MinioTests
     {
         string key = Guid.NewGuid().ToString("D");
 
-        PublicPolicy publicPolicy = new PublicPolicy(){ BucketName = key };
+        var publicPolicy = new PublicPolicy(){ BucketName = key };
 
         publicPolicy.GetJsonPolicy().Should().NotBeNullOrWhiteSpace();
 
@@ -60,7 +59,7 @@ public class MinioTests
     {
         string key = Guid.NewGuid().ToString("D");
 
-        StaticPolicy publicPolicy = new StaticPolicy(){ PolicyText = key };
+        var publicPolicy = new StaticPolicy(){ PolicyText = key };
 
         Assert.Equal(key, publicPolicy.PolicyText);
         Assert.Equal(key, publicPolicy.GetJsonPolicy());
@@ -80,7 +79,8 @@ public class MinioTests
         };
         svc.IConfigurationMock
             .Setup(it => it.GetSection("boostrap:minio"))
-            .Returns(new FakeIConfigurationSection() { 
+            .Returns(new FakeIConfigurationSection()
+            {
                 Key = "boostrap:minio",
                 Value = "false"
             });
@@ -88,7 +88,7 @@ public class MinioTests
         await svc.InitializeAsync();
         await svc.ExecuteAsync();
 
-        svc.IMinioClientAdapterMock.Verify(it => it.ListBucketsAsync(It.IsAny<CancellationToken>()),Times.Never());
+        svc.IMinioClientAdapterMock.Verify(it => it.ListBucketsAsync(It.IsAny<CancellationToken>()), Times.Never());
     }
 
     [Fact]
@@ -227,30 +227,5 @@ public class MinioBootstrapperServiceForTests : MinioBootstrapperService
         this.Configuration = this.IConfigurationMock.Object;
 
         return base.InitializeAsync();
-    }
-}
-
-public class FakeIConfigurationSection : IConfigurationSection
-{
-    public string this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-    public string Key { get; set; }
-
-    public string Path { get; set; }
-
-    public string Value { get; set; }
-
-    public List<IConfigurationSection> FakeChildren { get; set; }
-
-    public IEnumerable<IConfigurationSection> GetChildren() => this.FakeChildren;
-
-    public IChangeToken GetReloadToken()
-    {
-        throw new NotImplementedException();
-    }
-
-    public IConfigurationSection GetSection(string key)
-    {
-        return this.FakeChildren?.Where(it => it.Key == key).SingleOrDefault() ?? null;
     }
 }

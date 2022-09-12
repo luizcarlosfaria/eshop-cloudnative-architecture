@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static eShopCloudNative.Architecture.Extensions.SpringExtensions;
 
-namespace eShopCloudNative.Architecture.Tests;
+namespace eShopCloudNative.Architecture.Tests.Bootstrapp;
 public class SpringTests
 {
     [Fact]
@@ -18,7 +18,7 @@ public class SpringTests
     {
         ObjectContainer.Define("a").Should().Be("a");
 
-        var item = new Object();
+        var item = new object();
 
         ObjectContainer.Define(item).Should().Be(item);
     }
