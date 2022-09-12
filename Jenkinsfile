@@ -7,7 +7,7 @@ pipeline {
     }
 
     options {
-      throttleJobProperty(
+        (
           categories: ['eshop'],
           throttleEnabled: true,
           throttleOption: 'category'
@@ -68,6 +68,7 @@ pipeline {
                         dotnet build ./eShopCloudNative.Architecture.sln
 
                         dotnet sonarscanner end /d:sonar.login="$SONARQUBE_KEY"
+
                         '''
 
                 }
@@ -93,7 +94,9 @@ pipeline {
                     def projetcs = [
 						'./eShopCloudNative.Architecture/eShopCloudNative.Architecture.csproj',
                         './eShopCloudNative.Architecture.Bootstrap/eShopCloudNative.Architecture.Bootstrap.csproj'
+                        './eShopCloudNative.Architecture.Data/eShopCloudNative.Architecture.Data.csproj'
                     ]
+                    
 
                     if (env.BRANCH_NAME.endsWith("-alpha")) {
 
