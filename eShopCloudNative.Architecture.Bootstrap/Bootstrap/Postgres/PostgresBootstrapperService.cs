@@ -165,10 +165,6 @@ public class PostgresBootstrapperService : IBootstrapperService
                 runner.MigrateUp();
             }
         }
-        else
-        {
-            //TODO: Logar informando que não foi executada a migration porque o Tipo estava nulo
-        }
     }
 
 }
