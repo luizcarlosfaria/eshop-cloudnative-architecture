@@ -148,29 +148,6 @@ public class RabbbitMQBootstrapperServiceTests
 
     }
 
-
-    public class RabbbitMQBootstrapperService2 : RabbbitMQBootstrapperService
-    {
-        public Func<Task<string>> PublicAuthorizationHeaderValueGetter() => base.AuthorizationHeaderValueGetter();
-    }
-
-    [Fact]
-    public async Task RabbbitMQBootstrapperServiceAuthorizationHeaderRefitAsync()
-    {
-        var src1 = new RabbbitMQBootstrapperService2()
-        {
-            HttpApiCredentials = new System.Net.NetworkCredential("u","p")
-        };
-
-        Func<Task<string>> func = src1.PublicAuthorizationHeaderValueGetter();
-        Task<string> task = func();
-        string text = await task;
-
-        text.Should().Be($"Basic {Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes("u:p"))}");
-
-    }
-
-
     [Fact]
     public async Task RabbbitMQBootstrapperServiceExecuteAsyncIAdminCommandExecutionAsync()
     {

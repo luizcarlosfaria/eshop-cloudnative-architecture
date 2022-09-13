@@ -14,7 +14,7 @@ public class CreateUserCommand : IAdminCommand
     public Task PrepareAsync()
     {
         Guard.Against.Null(this.Credential, nameof(this.Credential));
-        Guard.Against.NullOrWhiteSpace(this.Tags, nameof(this.Tags));
+        Guard.Against.Null(this.Tags, nameof(this.Tags));
         
         return Task.CompletedTask;
     }

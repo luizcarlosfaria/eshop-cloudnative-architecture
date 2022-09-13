@@ -2,6 +2,7 @@
 using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AdminCommands;
 using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AmqpCommands;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using Refit;
 using System;
@@ -48,20 +49,13 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
         return Task.CompletedTask;
     }
 
-    protected Func<Task<string>> AuthorizationHeaderValueGetter()
-        => () => Task.FromResult($"Basic {Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(this.HttpApiCredentials.UserName + ":" + this.HttpApiCredentials.Password))}");
-
     public async Task ExecuteAsync()
     {
         if (this.Configuration.GetValue<bool>("boostrap:rabbitmq"))
         {
-            using IConnection connection = this.AmqpConnectionFactory.CreateConnection();
-            using IModel model = connection.CreateModel();
-            using IRabbitMQAdminApi api = this.BuildRabbitMQAdminApi();
-
             foreach (var command in this.Commands)
             {
-                await this.RunAsync(model, api, command);
+                await this.RunAsync(command);
             }
         }
     }
@@ -69,29 +63,44 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
     private IRabbitMQAdminApi BuildRabbitMQAdminApi()
     {
         IRabbitMQAdminApi api = null;
+
         if (!string.IsNullOrWhiteSpace(this.HttpUri))
         {
-            api = RestService.For<IRabbitMQAdminApi>(this.HttpUri, new RefitSettings()
+            ServiceCollection services = new ServiceCollection();
+
+            services.AddRefitClient<IRabbitMQAdminApi>()
+            .ConfigureHttpClient(c =>
             {
-                AuthorizationHeaderValueGetter = this.AuthorizationHeaderValueGetter()
+                c.BaseAddress = new Uri(this.HttpUri);
+                c.DefaultRequestHeaders.Add("Authorization", $"Basic {Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(this.HttpApiCredentials.UserName + ":" + this.HttpApiCredentials.Password))}");
             });
+
+            api = services.BuildServiceProvider().GetRequiredService<IRabbitMQAdminApi>();
         }
+
         return api;
     }
 
-    private async Task RunAsync(IModel model, IRabbitMQAdminApi api, IRabbitMQCommand command)
+    private async Task RunAsync(IRabbitMQCommand command)
     {
         Guard.Against.Null(command);
 
         switch (command)
         {
             case IAmqpCommand amqpCommand:
-                amqpCommand.Prepare();
-                amqpCommand.Execute(model);
+                using (IConnection connection = this.AmqpConnectionFactory.CreateConnection())
+                {
+                    using IModel model = connection.CreateModel();
+                    amqpCommand.Prepare();
+                    amqpCommand.Execute(model);
+                }
                 break;
             case IAdminCommand rabbitMQHTTPCommand:
-                await rabbitMQHTTPCommand.PrepareAsync();
-                await rabbitMQHTTPCommand.ExecuteAsync(api);
+                using (IRabbitMQAdminApi api = this.BuildRabbitMQAdminApi())
+                {
+                    await rabbitMQHTTPCommand.PrepareAsync();
+                    await rabbitMQHTTPCommand.ExecuteAsync(api);
+                }
                 break;
             default:
                 throw new NotSupportedException($"The Type {command.GetType().Name} is a valid {nameof(IRabbitMQCommand)} but RabbbitMQBootstrapperService does not know this type.");
