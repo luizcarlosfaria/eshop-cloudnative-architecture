@@ -13,7 +13,7 @@ public static class ConfigurationExtensions
     {
         Guard.Against.Null(configuration, nameof(configuration));
         Guard.Against.NullOrWhiteSpace(key, nameof(key));
-        return configuration.ConfigureWith(key, Activator.CreateInstance<T>()); ;
+        return configuration.ConfigureWith(key, Activator.CreateInstance<T>());
     }
 
     public static T ConfigureWith<T>(this IConfiguration configuration, string key, T item)

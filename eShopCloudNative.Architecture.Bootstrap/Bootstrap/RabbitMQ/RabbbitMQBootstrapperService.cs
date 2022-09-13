@@ -62,7 +62,7 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
             {
                 AuthorizationHeaderValueGetter = this.AuthorizationHeaderValueGetter()
             };
-            var api = RestService.For<IRabbitMQAdminAPI>(this.HttpUri ?? "https://dommy:0", settings);
+            var api = RestService.For<_IRabbitMQAdminApi>(this.HttpUri ?? "https://dommy:0", settings);
 
             foreach (var command in this.Commands)
             {
@@ -71,7 +71,7 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
         }
     }
 
-    private async Task RunAsync(IModel model, IRabbitMQAdminAPI api, IRabbitMQCommand command)
+    private async Task RunAsync(IModel model, _IRabbitMQAdminApi api, IRabbitMQCommand command)
     {
         Guard.Against.Null(command);
 

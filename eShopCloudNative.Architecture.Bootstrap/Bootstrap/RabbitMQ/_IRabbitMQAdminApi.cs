@@ -111,7 +111,7 @@ public class CreateUserRequest
 
 }
 
-public class UserVhostPermission: VhostPermission
+public class UserVhostPermission : VhostPermission
 {
 
     [JsonProperty("user")]
@@ -134,8 +134,8 @@ public class VhostPermission
     [JsonProperty("read")]
     public string Read { get; set; }
 
-    public VhostPermission ConfitgureAll() { this.Configure = ".*"; ; return this; }
-    public VhostPermission WriteAll() { this.Write = ".*"; ; return this; }
-    public VhostPermission ReadAll() { this.Read = ".*"; ; return this; }
+    public VhostPermission ConfitgureAll() { this.Configure = ".*"; return this; }
+    public VhostPermission WriteAll() { this.Write = ".*"; return this; }
+    public VhostPermission ReadAll() { this.Read = ".*"; return this; }
     public VhostPermission FullAccessAll() => this.ConfitgureAll().WriteAll().ReadAll();
 }

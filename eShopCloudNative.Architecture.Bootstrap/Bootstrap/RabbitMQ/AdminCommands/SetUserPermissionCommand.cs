@@ -26,7 +26,7 @@ public class SetUserPermissionCommand : IAdminCommand
         return Task.CompletedTask;
     }
 
-    public Task ExecuteAsync(IRabbitMQAdminAPI api)
+    public Task ExecuteAsync(_IRabbitMQAdminApi api)
      => api.SetUserVirtualHostPermissionsAsync(this.Vhost, this.UserName, new VhostPermission()
      {
          Configure = this.ConfigurePattern,

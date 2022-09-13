@@ -211,7 +211,7 @@ public class RabbbitMQBootstrapperServiceTests
         await src1.ExecuteAsync();
 
         commandMock.Verify(it => it.PrepareAsync(), Times.Once());
-        commandMock.Verify(it => it.ExecuteAsync(It.IsNotNull<IRabbitMQAdminAPI>()), Times.Once());
+        commandMock.Verify(it => it.ExecuteAsync(It.IsNotNull<_IRabbitMQAdminApi>()), Times.Once());
 
     }
 
