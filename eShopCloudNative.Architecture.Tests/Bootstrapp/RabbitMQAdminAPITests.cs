@@ -32,7 +32,6 @@ public class RabbitMQAdminAPITests
      */
 
     //[Fact]
-    [Fact(Skip = "Integration")]
     public async Task GetVirtualHostAsync()
     {
         IRabbitMQAdminApi api = BuildApi();
@@ -41,7 +40,6 @@ public class RabbitMQAdminAPITests
     }
 
     //[Fact]
-    [Fact(Skip = "Integration")]
     public async Task CreateVirtualHostAsync()
     {
         using IRabbitMQAdminApi api = BuildApi();
