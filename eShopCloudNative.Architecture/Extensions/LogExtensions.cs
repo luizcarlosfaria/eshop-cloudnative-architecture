@@ -27,6 +27,7 @@ public static class LogExtensions
         {
             loggerConfiguration
             .Enrich.FromLogContext()
+            .Enrich.FromGlobalLogContext()
             .WriteTo.RabbitMQ(ConfigureRabbitMQ(configurationKey, hostBuilderContext))
             .WriteTo.Console();
         });
