@@ -5,5 +5,5 @@ namespace eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AdminCommands;
 public interface IAdminCommand : IRabbitMQCommand
 {
     Task PrepareAsync();
-    Task ExecuteAsync(_IRabbitMQAdminApi api);
+    Task ExecuteAsync(IRabbitMQAdminApi api);
 }

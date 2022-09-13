@@ -19,7 +19,7 @@ public class CreateUserCommand : IAdminCommand
         return Task.CompletedTask;
     }
 
-    public Task ExecuteAsync(_IRabbitMQAdminApi api)
+    public Task ExecuteAsync(IRabbitMQAdminApi api)
      => api.CreateUserAsync(this.Credential.UserName, new CreateUserRequest() { Password = this.Credential.Password, Tags = this.Tags });
 
 }

@@ -12,18 +12,18 @@ namespace eShopCloudNative.Architecture.Tests.Bootstrapp;
 
 public class RabbitMQAdminAPITests
 {
-    private static _IRabbitMQAdminApi BuildApi()
+    private static IRabbitMQAdminApi BuildApi()
     {
         var services = new ServiceCollection();
         services
-            .AddRefitClient<_IRabbitMQAdminApi>()
+            .AddRefitClient<IRabbitMQAdminApi>()
             .ConfigureHttpClient(c =>
             {
                 c.BaseAddress = new Uri("http://localhost:15672/");
                 c.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes("guest:guest")));
             });
 
-        return services.BuildServiceProvider().GetRequiredService<_IRabbitMQAdminApi>();
+        return services.BuildServiceProvider().GetRequiredService<IRabbitMQAdminApi>();
     }
 
     /*
@@ -35,7 +35,7 @@ public class RabbitMQAdminAPITests
     [Fact(Skip = "Integration")]
     public async Task GetVirtualHostAsync()
     {
-        _IRabbitMQAdminApi api = BuildApi();
+        IRabbitMQAdminApi api = BuildApi();
 
         var vhosts = await api.GetVirtualHostsAsync();
     }
@@ -44,7 +44,7 @@ public class RabbitMQAdminAPITests
     [Fact(Skip = "Integration")]
     public async Task CreateVirtualHostAsync()
     {
-        _IRabbitMQAdminApi api = BuildApi();
+        IRabbitMQAdminApi api = BuildApi();
 
         await api.CreateVirtualHostAsync("vhost1");
 

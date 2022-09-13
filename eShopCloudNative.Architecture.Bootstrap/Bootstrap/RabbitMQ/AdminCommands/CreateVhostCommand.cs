@@ -16,7 +16,7 @@ public class CreateVhostCommand : IAdminCommand
         return Task.CompletedTask;
     }
 
-    public Task ExecuteAsync(_IRabbitMQAdminApi api)
+    public Task ExecuteAsync(IRabbitMQAdminApi api)
      => api.CreateVirtualHostAsync(this.Name);
 
 }

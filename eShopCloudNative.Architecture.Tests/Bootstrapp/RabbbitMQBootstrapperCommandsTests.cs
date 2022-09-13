@@ -136,7 +136,7 @@ public class RabbbitMQBootstrapperCommandsTests
     [Fact]
     public async Task CreateUserCommandSucessAsync()
     {
-        var modelMock = new Mock<_IRabbitMQAdminApi>();
+        var modelMock = new Mock<IRabbitMQAdminApi>();
 
         var command = new CreateUserCommand()
         {
@@ -153,7 +153,7 @@ public class RabbbitMQBootstrapperCommandsTests
     [Fact]
     public async Task CreateVhostCommandSucessAsync()
     {
-        var modelMock = new Mock<_IRabbitMQAdminApi>();
+        var modelMock = new Mock<IRabbitMQAdminApi>();
 
         var command = new CreateVhostCommand()
         {
@@ -169,7 +169,7 @@ public class RabbbitMQBootstrapperCommandsTests
     [Fact]
     public async Task SetUserPermissionCommandSucessAsync()
     {
-        var modelMock = new Mock<_IRabbitMQAdminApi>();
+        var modelMock = new Mock<IRabbitMQAdminApi>();
 
         var command = new SetUserPermissionCommand()
         {
