@@ -27,17 +27,24 @@ public static class LogExtensions
         {
             loggerConfiguration
             .Enrich.FromLogContext()
-            .WriteTo.RabbitMQ((clientConfiguration, sinkConfiguration) =>
-            {
-                hostBuilderContext.Configuration
-                    .ConfigureWith(configurationKey, clientConfiguration)
-                    .Validate();
-
-                sinkConfiguration.TextFormatter = new JsonFormatter(closingDelimiter: null, renderMessage: true, formatProvider: null);
-
-            })
+            .WriteTo.RabbitMQ(ConfigureRabbitMQ(configurationKey, hostBuilderContext))
             .WriteTo.Console();
         });
+    }
+
+    [ExcludeFromCodeCoverage]
+    public static Action<RabbitMQClientConfiguration, RabbitMQSinkConfiguration> ConfigureRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext)
+        => (clientConfiguration, sinkConfiguration) 
+            => ConfigureRabbitMQ(configurationKey, hostBuilderContext, clientConfiguration, sinkConfiguration);
+    
+    [ExcludeFromCodeCoverage]
+    public static void ConfigureRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext, RabbitMQClientConfiguration clientConfiguration, RabbitMQSinkConfiguration sinkConfiguration)
+    {
+        hostBuilderContext.Configuration
+                        .ConfigureWith(configurationKey, clientConfiguration)
+                        .Validate();
+
+        sinkConfiguration.TextFormatter = new JsonFormatter(closingDelimiter: null, renderMessage: true, formatProvider: null);
     }
 
     public static void Validate(this RabbitMQClientConfiguration clientConfiguration)

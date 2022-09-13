@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace eShopCloudNative.Architecture.Bootstrap.RabbitMQ;
 
-public interface IRabbitMQAdminAPI
+public interface IRabbitMQAdminApi: IDisposable
 {
     // vhosts
 
@@ -39,8 +39,10 @@ public interface IRabbitMQAdminAPI
     Task<UserVhostPermission> GetUserVirtualHostPermissionsAsync(string vhost, string userName);
 
     [Put("/api/permissions/{vhost}/{userName}")]
-    Task SetUserVirtualHostPermissionsAsync(string vhost, string userName, [Body] VhostPermission permission);
+    Task SetVhostPermissionsAsync(string vhost, string userName, [Body] VhostPermission permission);
 
+    [Put("/api/topic-permissions/{vhost}/{userName}")]
+    Task SetTopicPermissionsAsync(string vhost, string userName, [Body] TopicPermission permission);
 
 }
 
@@ -124,7 +126,6 @@ public class UserVhostPermission : VhostPermission
 
 public class VhostPermission
 {
-
     [JsonProperty("configure")]
     public string Configure { get; set; }
 
@@ -138,4 +139,24 @@ public class VhostPermission
     public VhostPermission WriteAll() { this.Write = ".*"; return this; }
     public VhostPermission ReadAll() { this.Read = ".*"; return this; }
     public VhostPermission FullAccessAll() => this.ConfitgureAll().WriteAll().ReadAll();
+}
+
+public class TopicPermission
+{
+
+    [JsonProperty("exchange")]
+    public string Exchange { get; set; } = string.Empty;
+
+    [JsonProperty("write")]
+    public string Write { get; set; }
+
+    [JsonProperty("read")]
+    public string Read { get; set; }
+
+
+    public TopicPermission SetExchange(string exchange) { this.Exchange = exchange; return this; }
+
+    public TopicPermission WriteAll() { this.Write = ".*"; return this; }
+    public TopicPermission ReadAll() { this.Read = ".*"; return this; }
+    public TopicPermission FullAccessAll() => this.WriteAll().ReadAll();
 }

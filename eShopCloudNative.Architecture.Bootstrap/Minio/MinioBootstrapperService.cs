@@ -47,10 +47,6 @@ public class MinioBootstrapperService : IBootstrapperService
                 }
             }
         }
-        else
-        {
-            //TODO: Logar dizendo que está ignorando
-        }
     }
 
 }

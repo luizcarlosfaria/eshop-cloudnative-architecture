@@ -6,6 +6,7 @@ using eShopCloudNative.Architecture.Extensions;
 using eShopCloudNative.Architecture.Minio;
 using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
+using Refit;
 using Spring.Context.Support;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ using static eShopCloudNative.Architecture.Extensions.SpringExtensions;
 namespace eShopCloudNative.Architecture.Tests.Bootstrapp;
 public class RabbbitMQBootstrapperCommandsTests
 {
-    private RabbbitMQBootstrapperService Build(Mock<IModel> modelMock, IRabbitMQCommand command)
+    private static RabbbitMQBootstrapperService Build(Mock<IModel> modelMock, IRabbitMQCommand command)
     {
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
@@ -183,7 +184,7 @@ public class RabbbitMQBootstrapperCommandsTests
         await command.PrepareAsync();
         await command.ExecuteAsync(modelMock.Object);
 
-        modelMock.Verify(it => it.SetUserVirtualHostPermissionsAsync(
+        modelMock.Verify(it => it.SetVhostPermissionsAsync(
             nameof (SetUserPermissionCommand.Vhost),
             nameof(SetUserPermissionCommand.UserName),
             It.Is<VhostPermission>(

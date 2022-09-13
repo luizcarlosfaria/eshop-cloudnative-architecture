@@ -55,20 +55,28 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
     {
         if (this.Configuration.GetValue<bool>("boostrap:rabbitmq"))
         {
-            using var connection = this.AmqpConnectionFactory.CreateConnection();
-            using var model = connection.CreateModel();
-
-            var settings = new RefitSettings()
-            {
-                AuthorizationHeaderValueGetter = this.AuthorizationHeaderValueGetter()
-            };
-            var api = RestService.For<IRabbitMQAdminApi>(this.HttpUri ?? "https://dommy:0", settings);
+            using IConnection connection = this.AmqpConnectionFactory.CreateConnection();
+            using IModel model = connection.CreateModel();
+            using IRabbitMQAdminApi api = this.BuildRabbitMQAdminApi();
 
             foreach (var command in this.Commands)
             {
                 await this.RunAsync(model, api, command);
             }
         }
+    }
+
+    private IRabbitMQAdminApi BuildRabbitMQAdminApi()
+    {
+        IRabbitMQAdminApi api = null;
+        if (!string.IsNullOrWhiteSpace(this.HttpUri))
+        {
+            api = RestService.For<IRabbitMQAdminApi>(this.HttpUri, new RefitSettings()
+            {
+                AuthorizationHeaderValueGetter = this.AuthorizationHeaderValueGetter()
+            });
+        }
+        return api;
     }
 
     private async Task RunAsync(IModel model, IRabbitMQAdminApi api, IRabbitMQCommand command)

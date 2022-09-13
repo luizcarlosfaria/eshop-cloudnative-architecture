@@ -44,13 +44,14 @@ public class RabbitMQAdminAPITests
     [Fact(Skip = "Integration")]
     public async Task CreateVirtualHostAsync()
     {
-        IRabbitMQAdminApi api = BuildApi();
+        using IRabbitMQAdminApi api = BuildApi();
 
-        await api.CreateVirtualHostAsync("vhost1");
+        //await api.CreateVirtualHostAsync("vhost1");
 
-        await api.CreateUserAsync("userA", new CreateUserRequest() { Password = "userA", Tags = "administrator" });
+        //await api.CreateUserAsync("userA", new CreateUserRequest() { Password = "userA", Tags = "administrator" });
 
-        await api.SetUserVirtualHostPermissionsAsync("vhost1", "userA", new VhostPermission().FullAccessAll());
+        await api.SetVhostPermissionsAsync("/", "userA", new VhostPermission().FullAccessAll());
+        await api.SetTopicPermissionsAsync("/", "userA", new TopicPermission().FullAccessAll());
 
     }
 }
