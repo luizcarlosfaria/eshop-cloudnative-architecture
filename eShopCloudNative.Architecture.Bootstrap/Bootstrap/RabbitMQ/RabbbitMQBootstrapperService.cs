@@ -62,7 +62,7 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
             {
                 AuthorizationHeaderValueGetter = this.AuthorizationHeaderValueGetter()
             };
-            var api = RestService.For<IRabbitMQAdminAPI>(this.HttpUri ?? "http://____:0", settings);
+            var api = RestService.For<IRabbitMQAdminAPI>(this.HttpUri ?? "https://dommy:0", settings);
 
             foreach (var command in this.Commands)
             {
