@@ -3,6 +3,7 @@ using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AdminCommands;
 using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AmqpCommands;
 using Microsoft.Extensions.Configuration;
 using RabbitMQ.Client;
+using System.Text;
 
 namespace eShopCloudNative.Architecture.Tests.Bootstrapp;
 public class RabbbitMQBootstrapperServiceTests
@@ -115,12 +116,21 @@ public class RabbbitMQBootstrapperServiceTests
 
         var connectionFactoryMock = new Mock<IConnectionFactory>();
         connectionFactoryMock.Setup(it => it.CreateConnection()).Returns(connectionInstance);
+        connectionFactoryMock.Setup(it => it.UserName).Returns("u");
+        connectionFactoryMock.Setup(it => it.Password).Returns("p");
         var connectionFactoryInstance = connectionFactoryMock.Object;
 
-        var commandMock = new Mock<IAmqpCommand>();
-        var commandInstance = commandMock.Object;
+        var IAmqpCommandMock = new Mock<IAmqpCommand>();
+        var IAmqpCommandInstance = IAmqpCommandMock.Object;
 
-        var listInstance = new List<IRabbitMQCommand>(){ commandInstance };
+        var IAdminCommandMock = new Mock<IAdminCommand>();
+        var IAdminCommandInstance = IAdminCommandMock.Object;
+
+
+        var listInstance = new List<IRabbitMQCommand>(){
+            IAmqpCommandInstance,
+            IAdminCommandInstance
+        };
 
         var src1 = new RabbbitMQBootstrapperService()
         {
@@ -128,12 +138,35 @@ public class RabbbitMQBootstrapperServiceTests
             AmqpConnectionFactory = connectionFactoryInstance,
             Commands = listInstance,
             HttpUri = "http://localhost:15672",
-            HttpApiCredentials= new System.Net.NetworkCredential("u","p")
+            HttpApiCredentials = new System.Net.NetworkCredential("u","p")
         };
+        await src1.InitializeAsync();
         await src1.ExecuteAsync();
 
-        commandMock.Verify(it => it.Prepare(), Times.Once());
-        commandMock.Verify(it => it.Execute(modelInstance), Times.Once());
+        IAmqpCommandMock.Verify(it => it.Prepare(), Times.Once());
+        IAmqpCommandMock.Verify(it => it.Execute(modelInstance), Times.Once());
+
+    }
+
+
+    public class RabbbitMQBootstrapperService2 : RabbbitMQBootstrapperService
+    {
+        public Func<Task<string>> PublicAuthorizationHeaderValueGetter() => base.AuthorizationHeaderValueGetter();
+    }
+
+    [Fact]
+    public async Task RabbbitMQBootstrapperServiceAuthorizationHeaderRefitAsync()
+    {
+        var src1 = new RabbbitMQBootstrapperService2()
+        {
+            HttpApiCredentials = new System.Net.NetworkCredential("u","p")
+        };
+
+        Func<Task<string>> func = src1.PublicAuthorizationHeaderValueGetter();
+        Task<string> task = func();
+        string text = await task;
+
+        text.Should().Be($"Basic {Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes("u:p"))}");
 
     }
 

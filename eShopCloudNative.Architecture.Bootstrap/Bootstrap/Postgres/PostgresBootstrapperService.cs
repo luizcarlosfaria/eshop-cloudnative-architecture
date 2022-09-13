@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using eShopCloudNative.Architecture.Bootstrap;
 using Ardalis.GuardClauses;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 
 namespace eShopCloudNative.Architecture.Bootstrap.Postgres;
 
@@ -40,10 +41,12 @@ public class PostgresBootstrapperService : IBootstrapperService
         Guard.Against.NullOrWhiteSpace(this.SysAdminUser.Password, nameof(this.SysAdminUser.Password));
 
         Guard.Against.Null(this.ServerEndpoint, nameof(this.ServerEndpoint));
+        Guard.Against.NullOrWhiteSpace(this.ServerEndpoint.Host, $"{nameof(this.ServerEndpoint)}.{nameof(this.ServerEndpoint.Host)}");
+        Guard.Against.Zero(this.ServerEndpoint.Port, $"{nameof(this.ServerEndpoint)}.{nameof(this.ServerEndpoint.Port)}");
 
         Guard.Against.Null(this.AppUser, nameof(this.AppUser));
-        Guard.Against.NullOrWhiteSpace(this.AppUser.UserName, nameof(this.AppUser.UserName));
-        Guard.Against.NullOrWhiteSpace(this.AppUser.Password, nameof(this.AppUser.Password));
+        Guard.Against.NullOrWhiteSpace(this.AppUser.UserName, $"{nameof(this.AppUser)}.{nameof(this.AppUser.UserName)}");
+        Guard.Against.NullOrWhiteSpace(this.AppUser.Password, $"{nameof(this.AppUser)}.{nameof(this.AppUser.Password)}");
 
         Guard.Against.NullOrWhiteSpace(this.DatabaseToCreate, nameof(this.DatabaseToCreate));
         Guard.Against.NullOrWhiteSpace(this.InitialDatabase, nameof(this.InitialDatabase));
@@ -133,28 +136,18 @@ public class PostgresBootstrapperService : IBootstrapperService
 
     }
 
+    [ExcludeFromCodeCoverage]
     protected virtual IDbConnection BuildConnection(string connectionString)
         => new NpgsqlConnection(connectionString);
 
     protected virtual string BuildConnectionString(string database, System.Net.NetworkCredential credential)
-        => $"server={this.ServerEndpoint?.Host ?? "localhost"};Port={this.ServerEndpoint?.Port};Database={database};User Id={credential.UserName};Password={credential.Password};";
+        => $"server={this.ServerEndpoint.Host};Port={this.ServerEndpoint.Port};Database={database};User Id={credential.UserName};Password={credential.Password};";
 
     private void ApplyMigrations()
     {
         if (this.MigrationType != null)
         {
-            var serviceProvider = new ServiceCollection()
-                .AddFluentMigratorCore()
-                .ConfigureRunner(rb => rb
-                    .AddPostgres11_0()
-                    .WithGlobalConnectionString(this.BuildConnectionString(this.DatabaseToCreate, this.SysAdminUser))
-                    .ScanIn(this.MigrationType.Assembly).For.Migrations())
-                .AddLogging(lb => lb.AddFluentMigratorConsole())
-                .Configure<RunnerOptions>(opt =>
-                {
-                    opt.Tags = new[] { "blue" };
-                })
-                .BuildServiceProvider(false);
+            IServiceProvider serviceProvider = this.BuildServiceProviderForMigration();
 
             using (var scope = serviceProvider.CreateScope())
             {
@@ -167,4 +160,20 @@ public class PostgresBootstrapperService : IBootstrapperService
         }
     }
 
+    [ExcludeFromCodeCoverage]
+    protected virtual IServiceProvider BuildServiceProviderForMigration()
+    {
+        return new ServiceCollection()
+            .AddFluentMigratorCore()
+            .ConfigureRunner(rb => rb
+                .AddPostgres11_0()
+                .WithGlobalConnectionString(this.BuildConnectionString(this.DatabaseToCreate, this.SysAdminUser))
+                .ScanIn(this.MigrationType.Assembly).For.Migrations())
+            .AddLogging(lb => lb.AddFluentMigratorConsole())
+            .Configure<RunnerOptions>(opt =>
+            {
+                opt.Tags = new[] { "blue" };
+            })
+            .BuildServiceProvider(false);
+    }
 }

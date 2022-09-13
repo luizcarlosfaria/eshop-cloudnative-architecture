@@ -1,5 +1,7 @@
 ﻿using eShopCloudNative.Architecture.Bootstrap.Postgres;
+using FluentMigrator.Runner;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -136,6 +138,52 @@ public class PostgresBootstrapperServiceTests
 
     }
 
+
+    [Fact]
+    public async Task MigrationsTest()
+    {
+        var migrationRunnerMock = new Mock<IMigrationRunner>();
+
+        var rootSP = new ServiceCollection()
+            .AddScoped((sp) => migrationRunnerMock.Object)
+            .BuildServiceProvider();
+
+        var svc = new PostgresTestService(rootSP)
+        {
+            SysAdminUser = new System.Net.NetworkCredential(){ UserName = "a", Password = "b" },
+            ServerEndpoint = new System.Net.DnsEndPoint("127.00.0.1", 1),
+            AppUser = new System.Net.NetworkCredential() { UserName = "a", Password = "b" },
+            DatabaseToCreate = "DatabaseToCreate",
+            InitialDatabase = "InitialDatabase",
+            SchemaToSetPermissions = "SchemaToSetPermissions",
+            Configuration = BuildConfiguration(),
+            MigrationType = this.GetType(),
+        };
+
+
+        var createAppUserIDbCommandMock = new Mock<IDbCommand>();
+        createAppUserIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0L);
+
+        var createDatabaseIDbCommandMock = new Mock<IDbCommand>();
+        createDatabaseIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0L);
+
+        var setPermissionsIDbCommandMock = new Mock<IDbCommand>();
+
+        svc.DbConnectionMock.SetupSequence(it => it.CreateCommand())
+            .Returns(createAppUserIDbCommandMock.Object)
+            .Returns(createDatabaseIDbCommandMock.Object)
+            .Returns(setPermissionsIDbCommandMock.Object);
+
+        await svc.ExecuteAsync();
+
+        createAppUserIDbCommandMock.Verify(it => it.ExecuteNonQuery(), Times.Once());
+        createDatabaseIDbCommandMock.Verify(it => it.ExecuteNonQuery(), Times.Once());
+        setPermissionsIDbCommandMock.Verify(it => it.ExecuteNonQuery(), Times.Exactly(2));
+
+        migrationRunnerMock.Verify(it => it.MigrateUp(), Times.Once());
+
+    }
+
     private static IConfiguration BuildConfiguration()
     {
         var configurationMock = new Mock<IConfiguration>();
@@ -149,19 +197,29 @@ public class PostgresBootstrapperServiceTests
         var configurationInstance = configurationMock.Object;
         return configurationInstance;
     }
+
+
+
 }
 
 
 public class PostgresTestService : PostgresBootstrapperService
 {
-    public Mock<IDbConnection> DbConnectionMock { get; set; } = new Mock<IDbConnection>();
-
-    protected override IDbConnection BuildConnection(string connectionString) => dbConnection;
-
     private IDbConnection dbConnection;
+    public Mock<IDbConnection> DbConnectionMock { get; set; } = new Mock<IDbConnection>();
+    protected override IDbConnection BuildConnection(string connectionString) => this.dbConnection;
 
-    public PostgresTestService()
+    private IServiceProvider serviceProvider;
+    protected override IServiceProvider BuildServiceProviderForMigration() => this.serviceProvider;
+    
+
+    public PostgresTestService(IServiceProvider serviceProvider = null)
     {
         this.dbConnection = this.DbConnectionMock.Object;
+        this.serviceProvider = serviceProvider;
     }
+
+    
+
+
 }

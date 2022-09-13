@@ -47,6 +47,10 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
 
         return Task.CompletedTask;
     }
+
+    protected Func<Task<string>> AuthorizationHeaderValueGetter()
+        => () => Task.FromResult($"Basic {Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes(this.HttpApiCredentials.UserName + ":" + this.HttpApiCredentials.Password))}");
+
     public async Task ExecuteAsync()
     {
         if (this.Configuration.GetValue<bool>("boostrap:rabbitmq"))
@@ -56,7 +60,7 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
 
             var settings = new RefitSettings()
             {
-                AuthorizationHeaderValueGetter = () => Task.FromResult($"Basic {Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1").GetBytes( this.HttpApiCredentials.UserName + ":" + this.HttpApiCredentials.Password  ))}")
+                AuthorizationHeaderValueGetter = this.AuthorizationHeaderValueGetter()
             };
             var api = RestService.For<IRabbitMQAdminAPI>(this.HttpUri ?? "http://____:0", settings);
 
