@@ -1,26 +1,46 @@
 ﻿using Ardalis.GuardClauses;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Serilog.AspNetCore;
-using Serilog.Configuration;
 using Serilog.Formatting.Json;
-using Serilog.Sinks.RabbitMQ;
 using Serilog.Sinks.RabbitMQ.Sinks.RabbitMQ;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using eShopCloudNative.Architecture.Extensions;
+using Serilog;
+using System;
 
-namespace eShopCloudNative.Architecture.Extensions;
-public static class LogExtensions
+namespace eShopCloudNative.Architecture.Logging;
+
+[ExcludeFromCodeCoverage]
+public static class EnterpriseApplicationLogExtensions
 {
-    [ExcludeFromCodeCoverage]
+    public static List<Tag> Add(this List<Tag> tags, string key, object value)
+    {
+        Guard.Against.Null(tags, nameof(tags));
+        Guard.Against.NullOrWhiteSpace(key, nameof(key));
+        tags.Add(new Tag(key, value));
+        return tags; ;
+    }
+
+    public static List<Tag> Remove(this List<Tag> tags, string key)
+    {
+        Guard.Against.Null(tags, nameof(tags));
+        Guard.Against.NullOrWhiteSpace(key, nameof(key));
+
+        return tags.Remove(it => it.Key == key);
+    }
+
+    public static List<Tag> Remove(this List<Tag> tags, Func<Tag, bool> predicate)
+    {
+        Guard.Against.Null(tags, nameof(tags));
+        Guard.Against.Null(predicate, nameof(predicate));
+
+        var itensToDelete = tags.Where(predicate).ToArray();
+        foreach (var itemToDelete in itensToDelete)
+            tags.Remove(itemToDelete);
+        return tags;
+    }
+
+   
     public static void AddEnterpriseApplicationLog(this ConfigureHostBuilder host, string configurationKey)
     {
         host.UseSerilog((hostBuilderContext, loggerConfiguration) =>
@@ -33,12 +53,11 @@ public static class LogExtensions
         });
     }
 
-    [ExcludeFromCodeCoverage]
-    public static Action<RabbitMQClientConfiguration, RabbitMQSinkConfiguration> ConfigureRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext)
-        => (clientConfiguration, sinkConfiguration) 
-            => ConfigureRabbitMQ(configurationKey, hostBuilderContext, clientConfiguration, sinkConfiguration);
     
-    [ExcludeFromCodeCoverage]
+    public static Action<RabbitMQClientConfiguration, RabbitMQSinkConfiguration> ConfigureRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext)
+        => (clientConfiguration, sinkConfiguration)
+            => ConfigureRabbitMQ(configurationKey, hostBuilderContext, clientConfiguration, sinkConfiguration);
+
     public static void ConfigureRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext, RabbitMQClientConfiguration clientConfiguration, RabbitMQSinkConfiguration sinkConfiguration)
     {
         hostBuilderContext.Configuration

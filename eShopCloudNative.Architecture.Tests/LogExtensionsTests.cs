@@ -1,4 +1,4 @@
-﻿using eShopCloudNative.Architecture.Extensions;
+﻿using eShopCloudNative.Architecture.Logging;
 using eShopCloudNative.Architecture.Tests.Bootstrapp;
 using Microsoft.Extensions.Configuration;
 using Serilog.Sinks.RabbitMQ.Sinks.RabbitMQ;

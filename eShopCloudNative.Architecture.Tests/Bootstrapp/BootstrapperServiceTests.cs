@@ -21,6 +21,8 @@ public class BootstrapperServiceTests
             await bootstrapperService.InitializeAsync();
         });
 
+        //--
+
         await Assert.ThrowsAsync<ArgumentNullException>(async () =>
         {
             var bootstrapperService = new BootstrapperService();
@@ -46,6 +48,8 @@ public class BootstrapperServiceTests
             await bootstrapperService.InitializeAsync();
         });
 
+        //--
+
         await Assert.ThrowsAsync<ArgumentNullException>(async () =>
         {
             var bootstrapperService = new BootstrapperService()
@@ -63,9 +67,11 @@ public class BootstrapperServiceTests
     [Fact]
     public async Task PropagationTestsAsync()
     {
-        var mock = new Mock<IBootstrapperService>();
+        Mock<IBootstrapperService> mock = null;
 
+        //--
 
+        mock = new Mock<IBootstrapperService>();
         var bootstrapperService = new BootstrapperService()
         {
             Services = new List<IBootstrapperService>()
@@ -74,13 +80,11 @@ public class BootstrapperServiceTests
                 }
         };
         await bootstrapperService.InitializeAsync();
-
-
         mock.Verify(m => m.InitializeAsync(), Times.Once());
 
+        //--
+
         mock = new Mock<IBootstrapperService>();
-
-
         bootstrapperService = new BootstrapperService()
         {
             Services = new List<IBootstrapperService>()
@@ -89,8 +93,6 @@ public class BootstrapperServiceTests
                 }
         };
         await bootstrapperService.ExecuteAsync();
-
-
         mock.Verify(m => m.ExecuteAsync(), Times.Once());
     }
 
