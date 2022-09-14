@@ -48,8 +48,8 @@ public class RabbitMQAdminAPITests
 
         //await api.CreateUserAsync("userA", new CreateUserRequest() { Password = "userA", Tags = "administrator" });
 
-        await api.SetVhostPermissionsAsync("/", "userA", new VhostPermission().FullAccessAll());
-        await api.SetTopicPermissionsAsync("/", "userA", new TopicPermission().FullAccessAll());
+        await api.SetVhostPermissionsAsync("/", "userA", new VhostPermission().FullAccess());
+        await api.SetTopicPermissionsAsync("/", "userA", new TopicPermission().FullAccess());
 
     }
 }

@@ -7,11 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Serilog.Context;
 using Ardalis.GuardClauses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace eShopCloudNative.Architecture.Logging;
 
 public class EnterpriseApplicationLog
 {
+    
     public static void SetGlobalContext(string applicationIdentity, Action<List<Tag>> tagBuilder = null)
     {
         Guard.Against.NullOrWhiteSpace(applicationIdentity, nameof(applicationIdentity));

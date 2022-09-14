@@ -5,9 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NHibernate;
+using System.Diagnostics.CodeAnalysis;
 
 namespace eShopCloudNative.Architecture.Data;
 
+[ExcludeFromCodeCoverage]
 public static class NHibernateExtensions
 {
 

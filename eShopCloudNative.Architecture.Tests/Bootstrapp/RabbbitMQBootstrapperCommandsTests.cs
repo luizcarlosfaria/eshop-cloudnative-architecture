@@ -202,10 +202,23 @@ public class RabbbitMQBootstrapperCommandsTests
         new VhostPermission().WriteAll().Write.Should().Be(".*");
         new VhostPermission().ReadAll().Read.Should().Be(".*");
 
-        var full = new VhostPermission().FullAccessAll();
+        var full = new VhostPermission().FullAccess();
         full.Configure.Should().Be(".*");
         full.Write.Should().Be(".*");
         full.Write.Should().Be(".*");
     }
+
+    [Fact]
+    public void TopicPermissionTest()
+    {
+        new TopicPermission().SetExchange("a").Exchange.Should().Be("a");
+        new TopicPermission().WriteAll().Write.Should().Be(".*");
+        new TopicPermission().ReadAll().Read.Should().Be(".*");
+
+        var full = new TopicPermission().FullAccess();
+        full.Write.Should().Be(".*");
+        full.Write.Should().Be(".*");
+    }
+    
 
 }

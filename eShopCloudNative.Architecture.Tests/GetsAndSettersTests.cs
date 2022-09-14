@@ -12,6 +12,7 @@ public class GetsAndSettersTests
     public void CoverageTricksTests()
     {
         TestGetAndSettes<PublicPolicy>();
+        TestGetAndSettes<TopicPermission>();
         TestGetAndSettes<Metadata>();
         TestGetAndSettes<VirtualHost>();
         TestGetAndSettes<User>();

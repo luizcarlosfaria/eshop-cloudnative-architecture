@@ -138,7 +138,7 @@ public class VhostPermission
     public VhostPermission ConfitgureAll() { this.Configure = ".*"; return this; }
     public VhostPermission WriteAll() { this.Write = ".*"; return this; }
     public VhostPermission ReadAll() { this.Read = ".*"; return this; }
-    public VhostPermission FullAccessAll() => this.ConfitgureAll().WriteAll().ReadAll();
+    public VhostPermission FullAccess() => this.ConfitgureAll().WriteAll().ReadAll();
 }
 
 public class TopicPermission
@@ -158,5 +158,5 @@ public class TopicPermission
 
     public TopicPermission WriteAll() { this.Write = ".*"; return this; }
     public TopicPermission ReadAll() { this.Read = ".*"; return this; }
-    public TopicPermission FullAccessAll() => this.WriteAll().ReadAll();
+    public TopicPermission FullAccess() => this.WriteAll().ReadAll();
 }

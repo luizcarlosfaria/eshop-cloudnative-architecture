@@ -3,9 +3,11 @@ using FluentNHibernate.Cfg;
 using Microsoft.Extensions.DependencyInjection;
 using NHibernate.Cfg;
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace eShopCloudNative.Architecture.Data;
 
+[ExcludeFromCodeCoverage]
 public class NHibernateConfigBuilder
 {
     private readonly IServiceCollection services;

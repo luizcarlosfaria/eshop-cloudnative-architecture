@@ -4,6 +4,7 @@ using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Create.Table;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -11,6 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace eShopCloudNative.Architecture.Data;
+
+[ExcludeFromCodeCoverage]
 public static class FluentMigratorExtensions
 {
     public static ICreateTableWithColumnSyntax Table(this ICreateExpressionRoot it, string tableName, string schema)
