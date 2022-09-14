@@ -69,7 +69,6 @@ public class NHibernateConfigBuilder
                  )
              .Mappings(it =>
              {
-
                  foreach (var type in this.typesToFindMapping)
                  {
                      it.FluentMappings.AddFromAssembly(type.Assembly);

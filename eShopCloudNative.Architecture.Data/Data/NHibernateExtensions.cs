@@ -12,8 +12,6 @@ namespace eShopCloudNative.Architecture.Data;
 [ExcludeFromCodeCoverage]
 public static class NHibernateExtensions
 {
-
-
     public static IServiceCollection AddNHibernate(this IServiceCollection services, Action<NHibernateConfigBuilder> configure)
     {
         NHibernateConfigBuilder builder = new(services);
