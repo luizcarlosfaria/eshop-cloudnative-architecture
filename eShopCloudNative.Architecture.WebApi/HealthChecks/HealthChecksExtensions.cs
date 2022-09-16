@@ -8,11 +8,14 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace eShopCloudNative.Architecture.HealthChecks;
+
+[ExcludeFromCodeCoverage]
 public static class HealthChecksExtensions
 {
     public static void AddCloudNativeHealthChecks(this IServiceCollection services, Action<IHealthChecksBuilder> configure = null)
