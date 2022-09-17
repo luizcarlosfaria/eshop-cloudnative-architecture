@@ -41,6 +41,62 @@ public class ConfigurationExtensionsTests
         result.Should().NotBeNull();
         result.Nome.Should().Be("Gago");
     }
+
+
+    [Fact]
+    public void GetFlagTrueTest()
+    {
+        var configurationMock = new Mock<IConfiguration>();
+        configurationMock
+            .Setup(it => it.GetSection("Teste"))
+            .Returns(new FakeIConfigurationSection()
+            {
+                Key = "Teste",
+                Value = "true"
+            });
+        var configurationInstance = configurationMock.Object;
+
+        var result = configurationInstance.GetFlag("Teste");
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void GetFlagFalseTest()
+    {
+        var configurationMock = new Mock<IConfiguration>();
+        configurationMock
+            .Setup(it => it.GetSection("Teste"))
+            .Returns(new FakeIConfigurationSection()
+            {
+                Key = "Teste",
+                Value = "false"
+            });
+        var configurationInstance = configurationMock.Object;
+
+        var result = configurationInstance.GetFlag("Teste");
+
+        result.Should().BeFalse();
+    }
+
+
+    [Fact]
+    public void GetFlagNotFoundTest()
+    {
+        var configurationMock = new Mock<IConfiguration>();
+        configurationMock
+            .Setup(it => it.GetSection("Teste"))
+            .Returns(new FakeIConfigurationSection()
+            {
+                Key = "Teste",
+                Value = null
+            });
+        var configurationInstance = configurationMock.Object;
+
+        var result = configurationInstance.GetFlag("Teste");
+
+        result.Should().BeFalse();
+    }
 }
 
 public class Teste

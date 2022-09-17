@@ -23,4 +23,12 @@ public static class ConfigurationExtensions
         configuration.Bind(key, item);
         return item;
     }
+
+    public static bool GetFlag(this IConfiguration configuration, params string[] keys)
+    {
+        Guard.Against.Null(configuration, nameof(configuration));
+        Guard.Against.NullOrEmpty(keys, nameof(keys));
+        string key = string.Join(":", keys);
+        return configuration.GetValue<bool>(key);
+    }
 }
