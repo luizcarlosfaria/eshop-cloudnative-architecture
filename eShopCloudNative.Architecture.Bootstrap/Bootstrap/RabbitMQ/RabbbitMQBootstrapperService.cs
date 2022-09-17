@@ -1,10 +1,12 @@
 ﻿using Ardalis.GuardClauses;
+using eShopCloudNative.Architecture.Bootstrap.Postgres;
 using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AdminCommands;
 using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AmqpCommands;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using Refit;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,12 +53,19 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
 
     public async Task ExecuteAsync()
     {
+        Log.Information("{svc} Iniciando... ", nameof(RabbbitMQBootstrapperService));
+
         if (this.Configuration.GetValue<bool>("boostrap:rabbitmq"))
         {
             foreach (var command in this.Commands)
             {
                 await this.RunAsync(command);
             }
+            Log.Information("{svc} Finalizado com sucesso!!! ", nameof(RabbbitMQBootstrapperService));
+        }
+        else
+        {
+            Log.Information("{svc} Bootstrap ignorado por configuração ", nameof(RabbbitMQBootstrapperService));
         }
     }
 
@@ -85,6 +94,8 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
     {
         Guard.Against.Null(command);
 
+        Log.Information("{svc} Executando Commando {cmdName}", nameof(RabbbitMQBootstrapperService), command.GetType().Name);
+
         switch (command)
         {
             case IAmqpCommand amqpCommand:
@@ -105,5 +116,7 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
             default:
                 throw new NotSupportedException($"The Type {command.GetType().Name} is a valid {nameof(IRabbitMQCommand)} but RabbbitMQBootstrapperService does not know this type.");
         }
+
+        Log.Information("{svc} Commando {cmdName} finalizado com sucesso!", nameof(RabbbitMQBootstrapperService), command.GetType().Name);
     }
 }
