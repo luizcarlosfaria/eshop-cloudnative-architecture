@@ -25,7 +25,7 @@ public class PostgresBootstrapperServiceTests
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
             .Setup(it => it.GetSection("boostrap:postgres"))
-            .Returns(new FakeIConfigurationSection()
+            .Returns(new FakeConfigurationSection()
             {
                 Key = "boostrap:postgres",
                 Value = "true"
@@ -189,7 +189,7 @@ public class PostgresBootstrapperServiceTests
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
             .Setup(it => it.GetSection("boostrap:postgres"))
-            .Returns(new FakeIConfigurationSection()
+            .Returns(new FakeConfigurationSection()
             {
                 Key = "boostrap:postgres",
                 Value = "true"

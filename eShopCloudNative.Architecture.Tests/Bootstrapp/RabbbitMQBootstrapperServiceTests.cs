@@ -62,7 +62,7 @@ public class RabbbitMQBootstrapperServiceTests
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
             .Setup(it => it.GetSection("boostrap:rabbitmq"))
-            .Returns(new FakeIConfigurationSection()
+            .Returns(new FakeConfigurationSection()
             {
                 Key = "boostrap:rabbitmq",
                 Value = "true"
@@ -100,7 +100,7 @@ public class RabbbitMQBootstrapperServiceTests
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
             .Setup(it => it.GetSection("boostrap:rabbitmq"))
-            .Returns(new FakeIConfigurationSection()
+            .Returns(new FakeConfigurationSection()
             {
                 Key = "boostrap:rabbitmq",
                 Value = "true"
@@ -154,7 +154,7 @@ public class RabbbitMQBootstrapperServiceTests
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
             .Setup(it => it.GetSection("boostrap:rabbitmq"))
-            .Returns(new FakeIConfigurationSection()
+            .Returns(new FakeConfigurationSection()
             {
                 Key = "boostrap:rabbitmq",
                 Value = "true"

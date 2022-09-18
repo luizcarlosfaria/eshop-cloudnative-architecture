@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace eShopCloudNative.Architecture.Extensions;
 public static class ConfigurationExtensions
 {
-    public static T CreateInstanceAndConfigureWith<T>(this IConfiguration configuration, string key)
+    public static T CreateAndConfigureWith<T>(this IConfiguration configuration, string key)
     {
         Guard.Against.Null(configuration, nameof(configuration));
         Guard.Against.NullOrWhiteSpace(key, nameof(key));

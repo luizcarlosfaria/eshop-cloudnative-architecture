@@ -79,11 +79,7 @@ public class MinioTests
         };
         svc.IConfigurationMock
             .Setup(it => it.GetSection("boostrap:minio"))
-            .Returns(new FakeIConfigurationSection()
-            {
-                Key = "boostrap:minio",
-                Value = "false"
-            });
+            .Returns(new FakeConfigurationSection().SetKeyValue("boostrap:minio", "false"));
 
         await svc.InitializeAsync();
         await svc.ExecuteAsync();
@@ -104,11 +100,7 @@ public class MinioTests
         };
         svc.IConfigurationMock
             .Setup(it => it.GetSection("boostrap:minio"))
-            .Returns(new FakeIConfigurationSection()
-            {
-                Key = "boostrap:minio",
-                Value = "true"
-            });
+            .Returns(new FakeConfigurationSection().SetKeyValue("boostrap:minio", "true"));
         svc.IMinioClientAdapterMock
             .Setup(it => it.ListBucketsAsync(It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult(new ListAllMyBucketsResult()
@@ -140,13 +132,11 @@ public class MinioTests
                 }
             },
         };
+
         svc.IConfigurationMock
             .Setup(it => it.GetSection("boostrap:minio"))
-            .Returns(new FakeIConfigurationSection()
-            {
-                Key = "boostrap:minio",
-                Value = "true"
-            });
+            .Returns(new FakeConfigurationSection().SetKeyValue("boostrap:minio", "true"));
+
         svc.IMinioClientAdapterMock
             .Setup(it => it.ListBucketsAsync(It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult(new ListAllMyBucketsResult()
@@ -179,13 +169,11 @@ public class MinioTests
                 }
             },
         };
+
         svc.IConfigurationMock
             .Setup(it => it.GetSection("boostrap:minio"))
-            .Returns(new FakeIConfigurationSection()
-            {
-                Key = "boostrap:minio",
-                Value = "true"
-            });
+            .Returns(new FakeConfigurationSection().SetKeyValue("boostrap:minio", "true"));
+
         svc.IMinioClientAdapterMock
             .Setup(it => it.ListBucketsAsync(It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult(new ListAllMyBucketsResult()

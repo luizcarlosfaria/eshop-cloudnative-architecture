@@ -16,30 +16,20 @@ public class ConfigurationExtensionsTests
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
             .Setup(it => it.GetSection("Teste"))
-            .Returns(new FakeIConfigurationSection()
-            {
-                Key = "Teste",
-                //Value = "true"
-                FakeChildren = new List<IConfigurationSection>()
-                {
-                    new FakeIConfigurationSection()
-                    {
-                        Key = "Nome",
-                        Value = "Gago",
-                        FakeChildren = new List<IConfigurationSection>()
-                        {
-
-                        }
-                    }
-                }
-            });
+            .Returns(
+                new FakeConfigurationSection()
+                    .SetKey("Teste")
+                    .AddChild(c1 => c1.SetKeyValue(nameof(Teste.Host), "rabbitmq"))
+                    .AddChild(c1 => c1.SetKeyValue(nameof(Teste.Port), "5672"))
+            );
         var configurationInstance = configurationMock.Object;
 
 
-        var result = configurationInstance.CreateInstanceAndConfigureWith<Teste>("Teste");
+        var result = configurationInstance.CreateAndConfigureWith<Teste>("Teste");
 
         result.Should().NotBeNull();
-        result.Nome.Should().Be("Gago");
+        result.Host.Should().Be("rabbitmq");
+        result.Port.Should().Be(5672);
     }
 
 
@@ -49,11 +39,7 @@ public class ConfigurationExtensionsTests
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
             .Setup(it => it.GetSection("Teste"))
-            .Returns(new FakeIConfigurationSection()
-            {
-                Key = "Teste",
-                Value = "true"
-            });
+            .Returns(new FakeConfigurationSection().SetKeyValue("Teste", "true"));
         var configurationInstance = configurationMock.Object;
 
         var result = configurationInstance.GetFlag("Teste");
@@ -67,11 +53,7 @@ public class ConfigurationExtensionsTests
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
             .Setup(it => it.GetSection("Teste"))
-            .Returns(new FakeIConfigurationSection()
-            {
-                Key = "Teste",
-                Value = "false"
-            });
+            .Returns(new FakeConfigurationSection().SetKeyValue("Teste", "false"));
         var configurationInstance = configurationMock.Object;
 
         var result = configurationInstance.GetFlag("Teste");
@@ -86,11 +68,7 @@ public class ConfigurationExtensionsTests
         var configurationMock = new Mock<IConfiguration>();
         configurationMock
             .Setup(it => it.GetSection("Teste"))
-            .Returns(new FakeIConfigurationSection()
-            {
-                Key = "Teste",
-                Value = null
-            });
+            .Returns(new FakeConfigurationSection().SetKeyValue("Teste", null));
         var configurationInstance = configurationMock.Object;
 
         var result = configurationInstance.GetFlag("Teste");
@@ -101,5 +79,6 @@ public class ConfigurationExtensionsTests
 
 public class Teste
 {
-    public string Nome { get; set; }
+    public string Host { get; set; }
+    public int Port { get; set; }
 }
