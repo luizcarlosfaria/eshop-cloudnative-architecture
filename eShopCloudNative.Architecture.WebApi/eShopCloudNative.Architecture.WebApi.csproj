@@ -8,7 +8,7 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI" Version="6.0.5" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.5" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="6.0.5" />
-        <!--<PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />-->
+        <!--<PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />--> 
 
     </ItemGroup>
 
