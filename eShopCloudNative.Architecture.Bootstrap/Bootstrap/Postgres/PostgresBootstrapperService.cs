@@ -203,7 +203,7 @@ public class PostgresBootstrapperService : IBootstrapperService
                 runner.MigrateUp();
 
                 Log.Information("{svc} IMigrationRunner.MigrateUp() finalizado com sucesso!!! ", nameof(PostgresBootstrapperService));
-                
+
                 Log.Information("{svc} ApplyMigrations finalizado com sucesso!!! ", nameof(PostgresBootstrapperService));
             }
         }
@@ -218,15 +218,17 @@ public class PostgresBootstrapperService : IBootstrapperService
     {
         return new ServiceCollection()
             .AddFluentMigratorCore()
-            .ConfigureRunner(rb => rb
-                .AddPostgres11_0()
-                .WithGlobalConnectionString(this.BuildConnectionString(this.DatabaseToCreate, this.SysAdminUser))
-                .ScanIn(this.MigrationType.Assembly).For.Migrations())
-            .AddLogging(lb => lb.AddFluentMigratorConsole())
-            .Configure<RunnerOptions>(opt =>
-            {
-                opt.Tags = new[] { "blue" };
-            })
+            .ConfigureRunner(this.ConfigureRunner)
+            .Configure<RunnerOptions>(this.ConfigureOptions)
             .BuildServiceProvider(false);
     }
+
+    [ExcludeFromCodeCoverage]
+    protected void ConfigureRunner(IMigrationRunnerBuilder migrationRunnerBuilder) =>
+        migrationRunnerBuilder.AddPostgres11_0()
+                .WithGlobalConnectionString(this.BuildConnectionString(this.DatabaseToCreate, this.SysAdminUser))
+                .ScanIn(this.MigrationType.Assembly).For.Migrations();
+
+    [ExcludeFromCodeCoverage]
+    protected void ConfigureOptions(RunnerOptions runnerOptions) => runnerOptions.Tags = new[] { "blue" };
 }

@@ -19,7 +19,7 @@ public static class EnterpriseApplicationLogExtensions
         Guard.Argument(tags, nameof(tags)).NotNull();
         Guard.Argument(key, nameof(key)).NotNull().NotEmpty().NotWhiteSpace();
         tags.Add(new Tag(key, value));
-        return tags; ;
+        return tags;
     }
 
     public static List<Tag> Remove(this List<Tag> tags, string key)
