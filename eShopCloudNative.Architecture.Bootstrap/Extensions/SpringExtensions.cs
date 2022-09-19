@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using Spring.Context;
 using Spring.Context.Support;
 using System;
@@ -16,8 +16,8 @@ public static class SpringExtensions
 {
     public static CodeConfigApplicationContext RegisterInstance(this CodeConfigApplicationContext context, string name, object instance)
     {
-        Guard.Against.Null(context, nameof(context));
-        Guard.Against.NullOrWhiteSpace(name, nameof(name));
+        Guard.Argument(context, nameof(context)).NotNull();
+        Guard.Argument(name, nameof(name)).NotNull().NotEmpty().NotWhiteSpace();
 
         var objectDefinition = new Spring.Objects.Factory.Support.GenericObjectDefinition
         {
@@ -33,7 +33,7 @@ public static class SpringExtensions
 
     public static XmlApplicationContext CreateChildContext(this CodeConfigApplicationContext context, params string[] configurationLocations)
     {
-        Guard.Against.Null(context, nameof(context));
+        Guard.Argument(context, nameof(context)).NotNull();
         return new(context, configurationLocations);
     }
 }

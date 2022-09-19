@@ -10,7 +10,7 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 using Microsoft.Extensions.Configuration;
 using eShopCloudNative.Architecture.Bootstrap;
-using Ardalis.GuardClauses;
+using Dawn;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using Serilog;
@@ -38,22 +38,22 @@ public class PostgresBootstrapperService : IBootstrapperService
 
     public Task InitializeAsync()
     {
-        Guard.Against.Null(this.SysAdminUser, nameof(this.SysAdminUser));
-        Guard.Against.NullOrWhiteSpace(this.SysAdminUser.UserName, nameof(this.SysAdminUser.UserName));
-        Guard.Against.NullOrWhiteSpace(this.SysAdminUser.Password, nameof(this.SysAdminUser.Password));
+        Guard.Argument(this.SysAdminUser, nameof(this.SysAdminUser)).NotNull();
+        Guard.Argument(this.SysAdminUser.UserName, nameof(this.SysAdminUser.UserName)).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(this.SysAdminUser.Password, nameof(this.SysAdminUser.Password)).NotNull().NotEmpty().NotWhiteSpace();
 
-        Guard.Against.Null(this.ServerEndpoint, nameof(this.ServerEndpoint));
-        Guard.Against.NullOrWhiteSpace(this.ServerEndpoint.Host, $"{nameof(this.ServerEndpoint)}.{nameof(this.ServerEndpoint.Host)}");
-        Guard.Against.Zero(this.ServerEndpoint.Port, $"{nameof(this.ServerEndpoint)}.{nameof(this.ServerEndpoint.Port)}");
+        Guard.Argument(this.ServerEndpoint, nameof(this.ServerEndpoint)).NotNull();
+        Guard.Argument(this.ServerEndpoint.Host, $"{nameof(this.ServerEndpoint)}.{nameof(this.ServerEndpoint.Host)}").NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(this.ServerEndpoint.Port, $"{nameof(this.ServerEndpoint)}.{nameof(this.ServerEndpoint.Port)}").NotZero();
 
-        Guard.Against.Null(this.AppUser, nameof(this.AppUser));
-        Guard.Against.NullOrWhiteSpace(this.AppUser.UserName, $"{nameof(this.AppUser)}.{nameof(this.AppUser.UserName)}");
-        Guard.Against.NullOrWhiteSpace(this.AppUser.Password, $"{nameof(this.AppUser)}.{nameof(this.AppUser.Password)}");
+        Guard.Argument(this.AppUser, nameof(this.AppUser)).NotNull();
+        Guard.Argument(this.AppUser.UserName, $"{nameof(this.AppUser)}.{nameof(this.AppUser.UserName)}").NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(this.AppUser.Password, $"{nameof(this.AppUser)}.{nameof(this.AppUser.Password)}").NotNull().NotEmpty().NotWhiteSpace();
 
-        Guard.Against.NullOrWhiteSpace(this.DatabaseToCreate, nameof(this.DatabaseToCreate));
-        Guard.Against.NullOrWhiteSpace(this.InitialDatabase, nameof(this.InitialDatabase));
+        Guard.Argument(this.DatabaseToCreate, nameof(this.DatabaseToCreate)).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(this.InitialDatabase, nameof(this.InitialDatabase)).NotNull().NotEmpty().NotWhiteSpace();
 
-        Guard.Against.Null(this.Configuration, nameof(this.Configuration));
+        Guard.Argument(this.Configuration, nameof(this.Configuration)).NotNull();
 
         return Task.CompletedTask;
     }

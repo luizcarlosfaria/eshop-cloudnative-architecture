@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -23,13 +23,13 @@ public class BootstrapperService : IBootstrapperService, IHostedService
 
     public async Task InitializeAsync()
     {
-        Guard.Against.Null(this.Services, nameof(this.Services));
+        Guard.Argument(this.Services, nameof(this.Services)).NotNull();
 
         this.BeforeInitialize?.Invoke(this, EventArgs.Empty);
 
         foreach (var service in this.Services)
         {
-            Guard.Against.Null(service, nameof(service));
+            Guard.Argument(service, nameof(service)).NotNull();
 
             await service.InitializeAsync();
         }
@@ -39,13 +39,13 @@ public class BootstrapperService : IBootstrapperService, IHostedService
 
     public async Task ExecuteAsync()
     {
-        Guard.Against.Null(this.Services, nameof(this.Services));
+        Guard.Argument(this.Services, nameof(this.Services)).NotNull();
 
         this.BeforeExecute?.Invoke(this, EventArgs.Empty);
 
         foreach (var service in this.Services)
         {
-            Guard.Against.Null(service, nameof(service));
+            Guard.Argument(service, nameof(service)).NotNull();
 
             await service.ExecuteAsync();
         }

@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +13,8 @@ public class CreateUserCommand : IAdminCommand
 
     public Task PrepareAsync()
     {
-        Guard.Against.Null(this.Credential, nameof(this.Credential));
-        Guard.Against.Null(this.Tags, nameof(this.Tags));
+        Guard.Argument(this.Credential, nameof(this.Credential)).NotNull();
+        Guard.Argument(this.Tags, nameof(this.Tags)).NotNull();
         
         return Task.CompletedTask;
     }

@@ -6,8 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Serilog.Context;
-using Ardalis.GuardClauses;
+using Dawn;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 
 namespace eShopCloudNative.Architecture.Logging;
 
@@ -16,7 +17,7 @@ public class EnterpriseApplicationLog
     
     public static void SetGlobalContext(string applicationIdentity, Action<List<Tag>> tagBuilder = null)
     {
-        Guard.Against.NullOrWhiteSpace(applicationIdentity, nameof(applicationIdentity));
+        Guard.Argument(applicationIdentity, nameof(applicationIdentity)).NotNull().NotEmpty().NotWhiteSpace();
 
         var tags = new List<Tag>();
 

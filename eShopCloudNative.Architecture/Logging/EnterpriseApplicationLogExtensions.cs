@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Hosting;
 using Serilog.Formatting.Json;
@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using eShopCloudNative.Architecture.Extensions;
 using Serilog;
 using System;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 
 namespace eShopCloudNative.Architecture.Logging;
 
@@ -15,24 +16,24 @@ public static class EnterpriseApplicationLogExtensions
 {
     public static List<Tag> Add(this List<Tag> tags, string key, object value)
     {
-        Guard.Against.Null(tags, nameof(tags));
-        Guard.Against.NullOrWhiteSpace(key, nameof(key));
+        Guard.Argument(tags, nameof(tags)).NotNull();
+        Guard.Argument(key, nameof(key)).NotNull().NotEmpty().NotWhiteSpace();
         tags.Add(new Tag(key, value));
         return tags; ;
     }
 
     public static List<Tag> Remove(this List<Tag> tags, string key)
     {
-        Guard.Against.Null(tags, nameof(tags));
-        Guard.Against.NullOrWhiteSpace(key, nameof(key));
+        Guard.Argument(tags, nameof(tags)).NotNull();
+        Guard.Argument(key, nameof(key)).NotNull().NotEmpty().NotWhiteSpace();
 
         return tags.Remove(it => it.Key == key);
     }
 
     public static List<Tag> Remove(this List<Tag> tags, Func<Tag, bool> predicate)
     {
-        Guard.Against.Null(tags, nameof(tags));
-        Guard.Against.Null(predicate, nameof(predicate));
+        Guard.Argument(tags, nameof(tags)).NotNull();
+        Guard.Argument(predicate, nameof(predicate)).NotNull();
 
         var itensToDelete = tags.Where(predicate).ToArray();
         foreach (var itemToDelete in itensToDelete)
@@ -69,12 +70,12 @@ public static class EnterpriseApplicationLogExtensions
 
     public static void Validate(this RabbitMQClientConfiguration clientConfiguration)
     {
-        Guard.Against.NullOrEmpty(clientConfiguration.Hostnames, nameof(clientConfiguration.Hostnames));
-        Guard.Against.NullOrWhiteSpace(clientConfiguration.VHost, nameof(clientConfiguration.VHost));
-        Guard.Against.NullOrWhiteSpace(clientConfiguration.Username, nameof(clientConfiguration.Username));
-        Guard.Against.NullOrWhiteSpace(clientConfiguration.Password, nameof(clientConfiguration.Password));
-        Guard.Against.NullOrWhiteSpace(clientConfiguration.Exchange, nameof(clientConfiguration.Exchange));
-        Guard.Against.NullOrWhiteSpace(clientConfiguration.ExchangeType, nameof(clientConfiguration.ExchangeType));
-        Guard.Against.Null(clientConfiguration.RouteKey, nameof(clientConfiguration.RouteKey));
+        Guard.Argument(clientConfiguration.Hostnames, nameof(clientConfiguration.Hostnames)).NotNull().NotEmpty();
+        Guard.Argument(clientConfiguration.VHost, nameof(clientConfiguration.VHost)).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(clientConfiguration.Username, nameof(clientConfiguration.Username)).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(clientConfiguration.Password, nameof(clientConfiguration.Password)).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(clientConfiguration.Exchange, nameof(clientConfiguration.Exchange)).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(clientConfiguration.ExchangeType, nameof(clientConfiguration.ExchangeType)).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(clientConfiguration.RouteKey, nameof(clientConfiguration.RouteKey)).NotNull();
     }
 }

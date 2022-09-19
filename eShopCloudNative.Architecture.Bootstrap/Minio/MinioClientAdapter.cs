@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using eShopCloudNative.Architecture.Extensions;
 using Minio;
 using Minio.DataModel;
@@ -29,12 +29,12 @@ public class MinioClientAdapter : IMinioClientAdapter
 
     public MinioClientAdapter(System.Net.DnsEndPoint serverEndpoint, System.Net.NetworkCredential credentials, bool withSSL)
     {
-        Guard.Against.Null(serverEndpoint, nameof(serverEndpoint));
-        Guard.Against.NullOrWhiteSpace(serverEndpoint.Host, nameof(serverEndpoint.Host));
+        Guard.Argument(serverEndpoint, nameof(serverEndpoint)).NotNull();
+        Guard.Argument(serverEndpoint.Host, nameof(serverEndpoint.Host)).NotNull().NotEmpty().NotWhiteSpace();
 
-        Guard.Against.Null(credentials, nameof(credentials));
-        Guard.Against.NullOrWhiteSpace(credentials.UserName, nameof(credentials.UserName));
-        Guard.Against.NullOrWhiteSpace(credentials.Password, nameof(credentials.Password));
+        Guard.Argument(credentials, nameof(credentials)).NotNull();
+        Guard.Argument(credentials.UserName, nameof(credentials.UserName)).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(credentials.Password, nameof(credentials.Password)).NotNull().NotEmpty().NotWhiteSpace();
 
         this.minioClient = new MinioClient()
             .WithEndpoint(serverEndpoint.Host, serverEndpoint.Port)

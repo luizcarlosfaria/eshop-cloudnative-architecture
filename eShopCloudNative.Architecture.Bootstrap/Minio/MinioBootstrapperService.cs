@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using eShopCloudNative.Architecture.Extensions;
 using System.Diagnostics.CodeAnalysis;
-using Ardalis.GuardClauses;
+using Dawn;
 
 namespace eShopCloudNative.Architecture.Minio;
 public class MinioBootstrapperService : IBootstrapperService
@@ -22,9 +22,9 @@ public class MinioBootstrapperService : IBootstrapperService
 
     public virtual Task InitializeAsync()
     {
-        Guard.Against.Null(this.Configuration, nameof(this.Configuration));
-        Guard.Against.Null(this.Minio, nameof(this.Minio));
-        Guard.Against.NullOrEmpty(this.BucketsToCreate, nameof(this.BucketsToCreate));
+        Guard.Argument(this.Configuration, nameof(this.Configuration)).NotNull();
+        Guard.Argument(this.Minio, nameof(this.Minio)).NotNull();
+        Guard.Argument(this.BucketsToCreate, nameof(this.BucketsToCreate)).NotNull().NotEmpty();
 
         return Task.CompletedTask;
     }

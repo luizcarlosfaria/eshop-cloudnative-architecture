@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using eShopCloudNative.Architecture.Bootstrap.Postgres;
 using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AdminCommands;
 using eShopCloudNative.Architecture.Bootstrap.RabbitMQ.AmqpCommands;
@@ -30,22 +30,22 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
 
     public Task InitializeAsync()
     {
-        Guard.Against.Null(this.Configuration, nameof(this.Configuration));
-        Guard.Against.NullOrEmpty(this.Commands, nameof(this.Commands));
+        Guard.Argument(this.Configuration, nameof(this.Configuration)).NotNull();
+        Guard.Argument(this.Commands, nameof(this.Commands)).NotNull().NotEmpty();
 
         if (this.Commands.Any(it => it is IAmqpCommand))
         {
-            Guard.Against.Null(this.AmqpConnectionFactory, nameof(this.AmqpConnectionFactory));
-            Guard.Against.NullOrEmpty(this.AmqpConnectionFactory.UserName, $"{nameof(this.AmqpConnectionFactory)}.{nameof(this.AmqpConnectionFactory.UserName)}");
-            Guard.Against.NullOrEmpty(this.AmqpConnectionFactory.Password, $"{nameof(this.AmqpConnectionFactory)}.{nameof(this.AmqpConnectionFactory.Password)}");
+            Guard.Argument(this.AmqpConnectionFactory, nameof(this.AmqpConnectionFactory)).NotNull();
+            Guard.Argument(this.AmqpConnectionFactory.UserName, $"{nameof(this.AmqpConnectionFactory)}.{nameof(this.AmqpConnectionFactory.UserName)}").NotNull().NotEmpty().NotWhiteSpace();
+            Guard.Argument(this.AmqpConnectionFactory.Password, $"{nameof(this.AmqpConnectionFactory)}.{nameof(this.AmqpConnectionFactory.Password)}").NotNull().NotEmpty().NotWhiteSpace();
         }
 
         if (this.Commands.Any(it => it is IAdminCommand))
         {
-            Guard.Against.NullOrEmpty(this.HttpUri, nameof(this.HttpUri));
-            Guard.Against.Null(this.HttpApiCredentials, nameof(this.HttpApiCredentials));
-            Guard.Against.NullOrEmpty(this.HttpApiCredentials.UserName, $"{nameof(this.HttpApiCredentials)}.{nameof(this.HttpApiCredentials.UserName)}");
-            Guard.Against.NullOrEmpty(this.HttpApiCredentials.Password, $"{nameof(this.HttpApiCredentials)}.{nameof(this.HttpApiCredentials.Password)}");
+            Guard.Argument(this.HttpUri, nameof(this.HttpUri)).NotNull().NotEmpty();
+            Guard.Argument(this.HttpApiCredentials, nameof(this.HttpApiCredentials)).NotNull();
+            Guard.Argument(this.HttpApiCredentials.UserName, $"{nameof(this.HttpApiCredentials)}.{nameof(this.HttpApiCredentials.UserName)}").NotNull().NotEmpty().NotWhiteSpace();
+            Guard.Argument(this.HttpApiCredentials.Password, $"{nameof(this.HttpApiCredentials)}.{nameof(this.HttpApiCredentials.Password)}").NotNull().NotEmpty().NotWhiteSpace();
         }
 
         return Task.CompletedTask;
@@ -92,7 +92,7 @@ public class RabbbitMQBootstrapperService : IBootstrapperService
 
     private async Task RunAsync(IRabbitMQCommand command)
     {
-        Guard.Against.Null(command);
+        Guard.Argument(command).NotNull();
 
         Log.Information("{svc} Executando Commando {cmdName}", nameof(RabbbitMQBootstrapperService), command.GetType().Name);
 

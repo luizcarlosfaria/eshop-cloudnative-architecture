@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ public class CreateVhostCommand : IAdminCommand
 
     public Task PrepareAsync()
     {
-        Guard.Against.NullOrWhiteSpace(this.Name, nameof(this.Name));
+        Guard.Argument(this.Name, nameof(this.Name)).NotNull().NotEmpty().NotWhiteSpace();
         return Task.CompletedTask;
     }
 

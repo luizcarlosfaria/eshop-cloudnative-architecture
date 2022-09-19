@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +10,9 @@ public static class FluentExtensions
 {
     public static T If<T>(this T target, Func<T, bool> condition, Func<T, T> actionWhenTrue, Func<T, T> actionWhenFalse = null)
     {
-        Guard.Against.Null(condition, nameof(condition));
-        Guard.Against.Null(actionWhenTrue, nameof(actionWhenTrue));
-      
+        Guard.Argument(condition, nameof(condition)).NotNull();
+        Guard.Argument(actionWhenTrue, nameof(actionWhenTrue)).NotNull();
+
         if (target == null)
             return target;
 
@@ -28,8 +28,8 @@ public static class FluentExtensions
 
     public static T If<T>(this T target, Func<T, bool> condition, Action<T> actionWhenTrue, Action<T> actionWhenFalse = null)
     {
-        Guard.Against.Null(condition, nameof(condition));
-        Guard.Against.Null(actionWhenTrue, nameof(actionWhenTrue));
+        Guard.Argument(condition, nameof(condition)).NotNull();
+        Guard.Argument(actionWhenTrue, nameof(actionWhenTrue)).NotNull();
 
         if (target == null)
             return target;

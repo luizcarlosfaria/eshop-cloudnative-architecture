@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,12 +16,12 @@ public class SetUserPermissionCommand : IAdminCommand
 
     public Task PrepareAsync()
     {
-        Guard.Against.NullOrWhiteSpace(this.Vhost, nameof(this.Vhost));
-        Guard.Against.NullOrWhiteSpace(this.UserName, nameof(this.UserName));
+        Guard.Argument(this.Vhost, nameof(this.Vhost)).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(this.UserName, nameof(this.UserName)).NotNull().NotEmpty().NotWhiteSpace();
 
-        Guard.Against.Null(this.ConfigurePattern, nameof(this.ConfigurePattern));
-        Guard.Against.Null(this.WritePattern, nameof(this.WritePattern));
-        Guard.Against.Null(this.ReadPattern, nameof(this.ReadPattern));
+        Guard.Argument(this.ConfigurePattern, nameof(this.ConfigurePattern)).NotNull();
+        Guard.Argument(this.WritePattern, nameof(this.WritePattern)).NotNull();
+        Guard.Argument(this.ReadPattern, nameof(this.ReadPattern)).NotNull();
 
         return Task.CompletedTask;
     }

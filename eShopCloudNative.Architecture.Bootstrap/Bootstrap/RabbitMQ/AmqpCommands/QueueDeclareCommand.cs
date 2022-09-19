@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
@@ -17,11 +17,11 @@ public class QueueDeclareCommand : IAmqpCommand
 
     public void Prepare()
     {
-        Guard.Against.NullOrEmpty(this.Queue);
+        Guard.Argument(this.Queue).NotNull().NotEmpty().NotWhiteSpace();
     }
 
     public void Execute(IModel model)
-        => Guard.Against.Null(model)
+        => Guard.Argument(model).NotNull().Value
         .QueueDeclare(queue: this.Queue, durable: this.Durable, exclusive: this.Exclusive, autoDelete: this.AutoDelete, arguments: this.Arguments);
 
 }

@@ -1,4 +1,4 @@
-﻿using Ardalis.GuardClauses;
+﻿using Dawn;
 using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
@@ -17,12 +17,12 @@ public class ExchangeDeclareCommand : IAmqpCommand
 
     public void Prepare()
     {
-        Guard.Against.NullOrEmpty(this.Exchange);
-        Guard.Against.NullOrEmpty(this.Type);
+        Guard.Argument(this.Exchange).NotNull().NotEmpty().NotWhiteSpace();
+        Guard.Argument(this.Type).NotNull().NotEmpty().NotWhiteSpace();
     }
 
     public void Execute(IModel model)
-        => Guard.Against.Null(model)
+        => Guard.Argument(model).NotNull().Value
         .ExchangeDeclare(exchange: this.Exchange, type: this.Type, durable: this.Durable, autoDelete: this.AutoDelete, arguments: this.Arguments);
 
 }
