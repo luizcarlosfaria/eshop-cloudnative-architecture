@@ -19,18 +19,21 @@ public class EnterpriseApplicationLog
     {
         Guard.Argument(applicationIdentity, nameof(applicationIdentity)).NotNull().NotEmpty().NotWhiteSpace();
 
-        var tags = new List<Tag>();
+        var tags = new List<Tag>
+        {
+            { "Application", applicationIdentity },
+            { "Hostname", Environment.MachineName },
+            { "UserName", Environment.UserName },
+            { "Platform", Environment.OSVersion.Platform },
+            { "OSVersion", Environment.OSVersion.ToString() },
+            { "ServiceStartup", new { Utc = DateTime.UtcNow, Local = DateTime.Now } }
+        };
 
         tagBuilder?.Invoke(tags);
 
-        tags.Add("Application", applicationIdentity);
-        tags.Add("Hostname", Environment.MachineName);
-        tags.Add("UserName", Environment.UserName);
-        tags.Add("Platform", Environment.OSVersion.Platform);
-        tags.Add("OSVersion", Environment.OSVersion.ToString());
-        tags.Add("ServiceStartup", new { Utc = DateTime.UtcNow, Local = DateTime.Now });
-
         foreach (var tag in tags)
+        {
             GlobalLogContext.PushProperty(tag.Key, tag.Value, true);
+        }
     }
 }

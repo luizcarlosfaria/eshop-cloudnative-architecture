@@ -49,17 +49,17 @@ public static class EnterpriseApplicationLogExtensions
             loggerConfiguration
             .Enrich.FromLogContext()
             .Enrich.FromGlobalLogContext()
-            .WriteTo.RabbitMQ(ConfigureRabbitMQ(configurationKey, hostBuilderContext))
+            .WriteTo.RabbitMQ(ConfigureSerilogWithRabbitMQ(configurationKey, hostBuilderContext))
             .WriteTo.Console();
         });
     }
 
     
-    public static Action<RabbitMQClientConfiguration, RabbitMQSinkConfiguration> ConfigureRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext)
+    public static Action<RabbitMQClientConfiguration, RabbitMQSinkConfiguration> ConfigureSerilogWithRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext)
         => (clientConfiguration, sinkConfiguration)
-            => ConfigureRabbitMQ(configurationKey, hostBuilderContext, clientConfiguration, sinkConfiguration);
+            => ConfigureSerilogWithRabbitMQ(configurationKey, hostBuilderContext, clientConfiguration, sinkConfiguration);
 
-    public static void ConfigureRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext, RabbitMQClientConfiguration clientConfiguration, RabbitMQSinkConfiguration sinkConfiguration)
+    public static void ConfigureSerilogWithRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext, RabbitMQClientConfiguration clientConfiguration, RabbitMQSinkConfiguration sinkConfiguration)
     {
         hostBuilderContext.Configuration
                         .ConfigureWith(configurationKey, clientConfiguration)
