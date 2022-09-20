@@ -350,3 +350,5 @@ MigrationBackup/
 .ionide/
 .sonarqube/
 output-tests/
+**/*.received.cs
+**/*.verified.cs
