@@ -61,6 +61,11 @@ public static class FluentMigratorExtensions
         it.WithColumn(memberExpression.GetPropertyName().UnderQuotes())
         .AsString(length);
 
+    public static ICreateTableColumnOptionOrWithColumnSyntax Clob<T>(this ICreateTableWithColumnSyntax it, Expression<Func<T, string>> memberExpression)
+        =>
+        it.WithColumn(memberExpression.GetPropertyName().UnderQuotes())
+        .AsString();
+
     public static ICreateTableColumnOptionOrWithColumnSyntax Column<T>(this ICreateTableWithColumnSyntax it, Expression<Func<T, bool>> memberExpression)
         =>
         it.WithColumn(memberExpression.GetPropertyName().UnderQuotes())
