@@ -194,6 +194,8 @@ public class PostgresBootstrapperService : IBootstrapperService
 
             using (var scope = serviceProvider.CreateScope())
             {
+                scope.ServiceProvider.GetRequiredService<CustomVersionTableMetaData>().TableName = $"{this.SchemaToSetPermissions}_VersionInfo" ;
+
                 Log.Debug("{svc} obtendo IMigrationRunner do escopo... ", nameof(PostgresBootstrapperService));
 
                 var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
@@ -220,15 +222,38 @@ public class PostgresBootstrapperService : IBootstrapperService
             .AddFluentMigratorCore()
             .ConfigureRunner(this.ConfigureRunner)
             .Configure<RunnerOptions>(this.ConfigureOptions)
+            .AddScoped(sp => new CustomVersionTableMetaData())
+            .AddScoped<IVersionTableMetaData>(sp => sp.GetRequiredService<CustomVersionTableMetaData>())
             .BuildServiceProvider(false);
     }
 
     [ExcludeFromCodeCoverage]
     protected void ConfigureRunner(IMigrationRunnerBuilder migrationRunnerBuilder) =>
         migrationRunnerBuilder.AddPostgres11_0()
-                .WithGlobalConnectionString(this.BuildConnectionString(this.DatabaseToCreate, this.SysAdminUser))
+                .WithGlobalConnectionString(this.BuildConnectionString(this.DatabaseToCreate, this.SysAdminUser))                
                 .ScanIn(this.MigrationType.Assembly).For.Migrations();
 
     [ExcludeFromCodeCoverage]
     protected void ConfigureOptions(RunnerOptions runnerOptions) => runnerOptions.Tags = new[] { "blue" };
+}
+
+[VersionTableMetaData]
+public class CustomVersionTableMetaData : IVersionTableMetaData
+{
+    public virtual string SchemaName { get; set; } = "";
+
+    public virtual string TableName { get; set; } = "_VersionInfo";
+
+    public virtual string ColumnName { get; set; } = "Version";
+
+    public virtual string UniqueIndexName { get; set; } = "UC_Version";
+
+    public virtual string AppliedOnColumnName { get; set; } = "AppliedOn";
+
+    public virtual string DescriptionColumnName { get; set; } = "Description";
+
+    public virtual bool OwnsSchema => false;
+
+    public object ApplicationContext { get; set; }
+
 }
