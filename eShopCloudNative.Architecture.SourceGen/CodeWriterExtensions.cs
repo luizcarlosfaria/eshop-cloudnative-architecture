@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using System;
 using System.IO;
 using System.Linq;
 
@@ -16,6 +17,24 @@ namespace eShopCloudNative.Architecture.SourceGen
             writer.WriteLine();
             return writer;
         }
+
+
+        public static bool Check(this SyntaxTokenList modifiers, params Func<string[], bool>[] expressions)
+        {
+            if (modifiers == null) return false;
+
+            bool returnValue = true;
+
+            var modifiersArray = modifiers.Select(it => it.ValueText).ToArray();
+
+            foreach (var expression in expressions)
+            {
+                returnValue = returnValue && expression(modifiersArray);
+            }
+            return returnValue;
+        }
+
+
 
         public static StringWriter WriteClassDeclaration(this StringWriter writer, string className, string modifiers, string[] baseTypes = null, Action<StringWriter> child = null)
         {
@@ -53,7 +72,7 @@ namespace eShopCloudNative.Architecture.SourceGen
             return writer;
         }
 
-        public static StringWriter WriteConstructor(this StringWriter writer, string modifiers, string name,  Member[] members = null, Action<StringWriter> pre = null, Action<StringWriter> pos = null)
+        public static StringWriter WriteConstructor(this StringWriter writer, string modifiers, string name, Member[] members = null, Action<StringWriter> pre = null, Action<StringWriter> pos = null)
         {
             pre?.Invoke(writer);
 
@@ -79,7 +98,10 @@ namespace eShopCloudNative.Architecture.SourceGen
 
     }
 
-    public class Member { 
+
+
+    public class Member
+    {
 
         public string Modifiers { get; set; }
         public string Name { get; set; }

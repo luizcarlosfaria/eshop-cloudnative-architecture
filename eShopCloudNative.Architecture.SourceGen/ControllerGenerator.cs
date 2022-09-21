@@ -60,7 +60,7 @@ namespace eShopCloudNative.Architecture.SourceGen
 
                 });
 
-            
+
 
 
             context.AddSource($"{targetClass.Identifier}.g.cs", SourceText.From(writer.ToString(), Encoding.UTF8));
@@ -74,10 +74,14 @@ namespace eShopCloudNative.Architecture.SourceGen
             {
                 // Business logic to decide what we're interested in goes here
                 if (syntaxNode is ClassDeclarationSyntax cds
-                    && cds.Identifier.ValueText.Contains("Controller")
-                    && cds.Modifiers != null
-                    && cds.Modifiers.ToArray().Any(it => it.ValueText == "public")
-                    && cds.Modifiers.ToArray().Any(it => it.ValueText == "partial")
+                    && cds.Identifier.ValueText.EndsWith("Controller")
+                    && cds.Modifiers.Check(
+                        (m) => m.Contains("public"),
+                        (m) => m.Contains("partial"),
+                        (m) => !m.Contains("abstract")
+                    )
+                    && cds.BaseList?.Types != null
+                    && cds.BaseList.Types.Any(it => it.Type is IdentifierNameSyntax id && id.Identifier.Text.StartsWith("I") && id.Identifier.Text.EndsWith("Service"))
                     )
                 {
                     this.ClassToAugment = cds;
