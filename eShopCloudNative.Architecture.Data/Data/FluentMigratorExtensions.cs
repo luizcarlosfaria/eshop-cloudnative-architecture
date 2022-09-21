@@ -74,16 +74,11 @@ public static class FluentMigratorExtensions
     private static string GetPropertyName<T1, T2>(this Expression<Func<T1, T2>> property)
     {
         var lambda = (LambdaExpression)property;
-        MemberExpression memberExpression;
 
-        if (lambda.Body is UnaryExpression unaryExpression)
-        {
-            memberExpression = (MemberExpression)unaryExpression.Operand;
-        }
-        else
-        {
-            memberExpression = (MemberExpression)lambda.Body;
-        }
+        MemberExpression memberExpression = 
+            lambda.Body is UnaryExpression unaryExpression 
+            ? (MemberExpression)unaryExpression.Operand 
+            : (MemberExpression)lambda.Body;
 
         return ((PropertyInfo)memberExpression.Member).Name;
     }
