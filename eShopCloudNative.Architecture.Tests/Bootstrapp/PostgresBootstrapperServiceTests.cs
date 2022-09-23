@@ -146,6 +146,7 @@ public class PostgresBootstrapperServiceTests
 
         var rootSP = new ServiceCollection()
             .AddScoped((sp) => migrationRunnerMock.Object)
+            .AddScoped(sp => new CustomVersionTableMetaData())
             .BuildServiceProvider();
 
         var svc = new PostgresTestService(rootSP)
