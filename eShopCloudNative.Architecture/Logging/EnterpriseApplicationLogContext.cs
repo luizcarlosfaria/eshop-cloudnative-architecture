@@ -37,7 +37,7 @@ public class EnterpriseApplicationLogContext : IDisposable
     {
         this.endAt = DateTime.Now.Ticks;
 
-        Log.Information($"{className}.{methodName} | Telemetry {{startAt}} | {{endAt}} | {{Elapsed}}", startAt, endAt, TimeSpan.FromTicks(endAt - startAt));
+        Log.Information($"{className}.{methodName}() | Telemetry {{StartAt}} | {{EndAt}} | {{Elapsed}}", startAt, endAt, TimeSpan.FromTicks(endAt - startAt));
 
         serilogLogContext.Dispose();
     }
