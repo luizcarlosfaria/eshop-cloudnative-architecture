@@ -14,11 +14,17 @@ namespace eShopCloudNative.Architecture.Logging;
 [ExcludeFromCodeCoverage]
 public static class EnterpriseApplicationLogExtensions
 {
-    public static List<Tag> Add(this List<Tag> tags, string key, object value)
+    public static List<Tag> Add(this List<Tag> tags, string key, object value) => tags.Add(key, TagType.None, value);
+
+    public static List<Tag> AddArgument(this List<Tag> tags, string key, object value) => tags.Add(key, TagType.Argument, value);
+
+    public static List<Tag> AddProperty(this List<Tag> tags, string key, object value) => tags.Add(key, TagType.Property, value);
+
+    public static List<Tag> Add(this List<Tag> tags, string key, TagType tagType, object value)
     {
         Guard.Argument(tags, nameof(tags)).NotNull();
         Guard.Argument(key, nameof(key)).NotNull().NotEmpty().NotWhiteSpace();
-        tags.Add(new Tag(key, value));
+        tags.Add(new Tag(key, tagType, value));
         return tags;
     }
 
@@ -41,7 +47,7 @@ public static class EnterpriseApplicationLogExtensions
         return tags;
     }
 
-   
+
     public static void AddEnterpriseApplicationLog(this ConfigureHostBuilder host, string configurationKey)
     {
         host.UseSerilog((hostBuilderContext, loggerConfiguration) =>
@@ -54,7 +60,7 @@ public static class EnterpriseApplicationLogExtensions
         });
     }
 
-    
+
     public static Action<RabbitMQClientConfiguration, RabbitMQSinkConfiguration> ConfigureSerilogWithRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext)
         => (clientConfiguration, sinkConfiguration)
             => ConfigureSerilogWithRabbitMQ(configurationKey, hostBuilderContext, clientConfiguration, sinkConfiguration);
