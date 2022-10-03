@@ -48,18 +48,32 @@ public static class EnterpriseApplicationLogExtensions
     }
 
 
-    public static void AddEnterpriseApplicationLog(this ConfigureHostBuilder host, string configurationKey)
+    public static void AddEnterpriseApplicationLog(this WebApplicationBuilder builder, string configurationKey, Mode mode)
     {
-        host.UseSerilog((hostBuilderContext, loggerConfiguration) =>
+        if (mode == Mode.Integrated)
         {
-            loggerConfiguration
-            .Enrich.FromLogContext()
-            .Enrich.FromGlobalLogContext()
-            .WriteTo.RabbitMQ(ConfigureSerilogWithRabbitMQ(configurationKey, hostBuilderContext))
-            .WriteTo.Console();
-        });
-    }
+            builder.Host.UseSerilog((hostBuilderContext, loggerConfiguration) =>
+            {
+                loggerConfiguration
+                .Enrich.FromLogContext()
+                .Enrich.FromGlobalLogContext()
+                .WriteTo.RabbitMQ(ConfigureSerilogWithRabbitMQ(configurationKey, hostBuilderContext))
+                .WriteTo.Console();
+            });
+        }
+        else if (mode == Mode.Standalone)
+        {
+            RabbitMQClientConfiguration rabbitMQClientConfiguration = builder.Configuration.ConfigureWith(configurationKey, new RabbitMQClientConfiguration()).Validate();
+            RabbitMQSinkConfiguration rabbitMQSinkConfiguration = new RabbitMQSinkConfiguration();
 
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .Enrich.FromGlobalLogContext()
+                .WriteTo.RabbitMQ(rabbitMQClientConfiguration, rabbitMQSinkConfiguration, new JsonFormatter())
+                .WriteTo.Console()
+                .CreateLogger();
+        }
+    }
 
     public static Action<RabbitMQClientConfiguration, RabbitMQSinkConfiguration> ConfigureSerilogWithRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext)
         => (clientConfiguration, sinkConfiguration)
@@ -74,7 +88,7 @@ public static class EnterpriseApplicationLogExtensions
         sinkConfiguration.TextFormatter = new JsonFormatter(closingDelimiter: null, renderMessage: true, formatProvider: null);
     }
 
-    public static void Validate(this RabbitMQClientConfiguration clientConfiguration)
+    public static RabbitMQClientConfiguration Validate(this RabbitMQClientConfiguration clientConfiguration)
     {
         Guard.Argument(clientConfiguration.Hostnames, nameof(clientConfiguration.Hostnames)).NotNull().NotEmpty();
         Guard.Argument(clientConfiguration.VHost, nameof(clientConfiguration.VHost)).NotNull().NotEmpty().NotWhiteSpace();
@@ -83,5 +97,21 @@ public static class EnterpriseApplicationLogExtensions
         Guard.Argument(clientConfiguration.Exchange, nameof(clientConfiguration.Exchange)).NotNull().NotEmpty().NotWhiteSpace();
         Guard.Argument(clientConfiguration.ExchangeType, nameof(clientConfiguration.ExchangeType)).NotNull().NotEmpty().NotWhiteSpace();
         Guard.Argument(clientConfiguration.RouteKey, nameof(clientConfiguration.RouteKey)).NotNull();
+
+        return clientConfiguration;
     }
+}
+
+public enum Mode
+{
+    /// <summary>
+    /// With this mode Enterprise Application Log will integrate with asp.net, and .NET log will be send to RabbitMQ
+    /// </summary>
+    Integrated,
+
+    /// <summary>
+    /// With this mode Enterprise Application Log will execute in standalone mode, and .NET log will not be send to RabbitMQ.
+    /// </summary>
+    Standalone
+
 }

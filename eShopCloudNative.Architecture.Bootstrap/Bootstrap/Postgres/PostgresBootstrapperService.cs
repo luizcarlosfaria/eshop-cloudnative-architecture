@@ -64,7 +64,7 @@ public class PostgresBootstrapperService : IBootstrapperService
     {
         if (this.Configuration.GetFlag("boostrap", "postgres"))
         {
-            Log.Information("{svc} Iniciando... ", nameof(PostgresBootstrapperService));
+            Log.Information($"{nameof(PostgresBootstrapperService)} Iniciando... ");
 
             using var rootConnection = this.BuildConnection(this.BuildConnectionString(this.InitialDatabase, this.SysAdminUser));
             rootConnection.Open();
@@ -77,11 +77,11 @@ public class PostgresBootstrapperService : IBootstrapperService
             databaseConnection.Open();
             this.SetPermissions(databaseConnection);
 
-            Log.Information("{svc} Finalizado com sucesso!!! ", nameof(PostgresBootstrapperService));
+            Log.Information($"{nameof(PostgresBootstrapperService)} Finalizado com sucesso!!! ");
         }
         else
         {
-            Log.Information("{svc} Bootstrap ignorado por configuração ", nameof(PostgresBootstrapperService));
+            Log.Information($"{nameof(PostgresBootstrapperService)} Bootstrap ignorado por configuração ");
         }
 
         return Task.CompletedTask;
@@ -90,7 +90,7 @@ public class PostgresBootstrapperService : IBootstrapperService
 
     private void CreateAppUser(IDbConnection connection)
     {
-        Log.Information("{svc} CreateAppUser... ", nameof(PostgresBootstrapperService));
+        Log.Information($"{nameof(PostgresBootstrapperService)} CreateAppUser... ");
 
         using var command = connection.CreateCommand();
 
@@ -100,7 +100,7 @@ public class PostgresBootstrapperService : IBootstrapperService
 
         if (qtd == 0)
         {
-            Log.Information("{svc} Criando usuário '{UserName}'...", nameof(PostgresBootstrapperService), this.AppUser.UserName);
+            Log.Information($"{nameof(PostgresBootstrapperService)} Criando usuário '{this.AppUser.UserName}'...");
 
             command.CommandText = @$"
                     CREATE ROLE {this.AppUser.UserName} WITH
@@ -115,17 +115,17 @@ public class PostgresBootstrapperService : IBootstrapperService
 
             command.ExecuteNonQuery();
 
-            Log.Information("{svc} Usuário '{UserName}' criado com sucesso!!", nameof(PostgresBootstrapperService), this.AppUser.UserName);
+            Log.Information($"{nameof(PostgresBootstrapperService)} Usuário '{this.AppUser.UserName}' criado com sucesso!!");
         }
         else
         {
-            Log.Information("{svc} Usuário '{UserName}' já existe, não foi criado!!", nameof(PostgresBootstrapperService), this.AppUser.UserName);
+            Log.Information($"{nameof(PostgresBootstrapperService)} Usuário '{this.AppUser.UserName}' já existe, não foi criado!!");
         }
     }
 
     private void CreateDatabase(IDbConnection connection)
     {
-        Log.Information("{svc} CreateDatabase... ", nameof(PostgresBootstrapperService));
+        Log.Information($"{nameof(PostgresBootstrapperService)} CreateDatabase... ");
 
         using var command = connection.CreateCommand();
 
@@ -135,7 +135,7 @@ public class PostgresBootstrapperService : IBootstrapperService
 
         if (qtd == 0)
         {
-            Log.Information("{svc} Criando DATABASE '{DatabaseToCreate}'...", nameof(PostgresBootstrapperService), this.DatabaseToCreate);
+            Log.Information($"{nameof(PostgresBootstrapperService)} Criando DATABASE '{this.DatabaseToCreate}'...");
 
             command.CommandText = @$"
                         CREATE DATABASE {this.DatabaseToCreate} 
@@ -146,18 +146,18 @@ public class PostgresBootstrapperService : IBootstrapperService
 
             command.ExecuteNonQuery();
 
-            Log.Information("{svc} DATABASE '{DatabaseToCreate}' criado com sucesso!!", nameof(PostgresBootstrapperService), this.DatabaseToCreate);
+            Log.Information($"{nameof(PostgresBootstrapperService)} DATABASE '{this.DatabaseToCreate}' criado com sucesso!!");
         }
         else
         {
-            Log.Information("{svc} DATABASE '{DatabaseToCreate}' já existe, não foi criado!!", nameof(PostgresBootstrapperService), this.DatabaseToCreate);
+            Log.Information($"{nameof(PostgresBootstrapperService)} DATABASE '{this.DatabaseToCreate}' já existe, não foi criado!!");
         }
 
     }
 
     private void SetPermissions(IDbConnection connection)
     {
-        Log.Information("{svc} SetPermissions... ", nameof(PostgresBootstrapperService));
+        Log.Information($"{nameof(PostgresBootstrapperService)} SetPermissions... ");
 
         using var command = connection.CreateCommand();
 
@@ -169,7 +169,7 @@ public class PostgresBootstrapperService : IBootstrapperService
 
         command.ExecuteNonQuery();
 
-        Log.Information("{svc} Permissões a Sequences e Tabelas concedidas ao usuário '{UserName}' no schema '{SchemaToSetPermissions}'... ", nameof(PostgresBootstrapperService), this.AppUser.UserName, this.SchemaToSetPermissions);
+        Log.Information($"{nameof(PostgresBootstrapperService)} Permissões a Sequences e Tabelas concedidas ao usuário '{this.AppUser.UserName}' no schema '{this.SchemaToSetPermissions}'... ");
 
     }
 
@@ -182,36 +182,36 @@ public class PostgresBootstrapperService : IBootstrapperService
 
     private void ApplyMigrations()
     {
-        Log.Information("{svc} ApplyMigrations... ", nameof(PostgresBootstrapperService));
+        Log.Information($"{nameof(PostgresBootstrapperService)} ApplyMigrations... ");
 
         if (this.MigrationType != null)
         {
-            Log.Debug("{svc} Criando service provider... ", nameof(PostgresBootstrapperService));
+            Log.Debug($"{nameof(PostgresBootstrapperService)} Criando service provider... ");
 
             IServiceProvider serviceProvider = this.BuildServiceProviderForMigration();
 
-            Log.Debug("{svc} Criando escopo... ", nameof(PostgresBootstrapperService));
+            Log.Debug($"{nameof(PostgresBootstrapperService)} Criando escopo... ");
 
             using (var scope = serviceProvider.CreateScope())
             {
                 scope.ServiceProvider.GetRequiredService<CustomVersionTableMetaData>().TableName = $"{this.SchemaToSetPermissions}_VersionInfo" ;
 
-                Log.Debug("{svc} obtendo IMigrationRunner do escopo... ", nameof(PostgresBootstrapperService));
+                Log.Debug($"{nameof(PostgresBootstrapperService)} obtendo IMigrationRunner do escopo... ");
 
                 var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
 
-                Log.Information("{svc} Executando IMigrationRunner.MigrateUp()...", nameof(PostgresBootstrapperService));
+                Log.Information($"{nameof(PostgresBootstrapperService)} Executando IMigrationRunner.MigrateUp()...");
 
                 runner.MigrateUp();
 
-                Log.Information("{svc} IMigrationRunner.MigrateUp() finalizado com sucesso!!! ", nameof(PostgresBootstrapperService));
+                Log.Information($"{nameof(PostgresBootstrapperService)} IMigrationRunner.MigrateUp() finalizado com sucesso!!! ");
 
-                Log.Information("{svc} ApplyMigrations finalizado com sucesso!!! ", nameof(PostgresBootstrapperService));
+                Log.Information($"{nameof(PostgresBootstrapperService)} ApplyMigrations finalizado com sucesso!!! ");
             }
         }
         else
         {
-            Log.Information("{svc} ApplyMigrations ignorado por configuração (MigrationType é nulo)", nameof(PostgresBootstrapperService));
+            Log.Information($"{nameof(PostgresBootstrapperService)} ApplyMigrations ignorado por configuração (MigrationType é nulo)");
         }
     }
 
