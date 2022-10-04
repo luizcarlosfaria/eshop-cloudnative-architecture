@@ -14,6 +14,8 @@ namespace eShopCloudNative.Architecture.Logging;
 [ExcludeFromCodeCoverage]
 public static class EnterpriseApplicationLogExtensions
 {
+    #region Tag Facilities
+
     public static List<Tag> Add(this List<Tag> tags, string key, object value) => tags.Add(key, TagType.None, value);
 
     public static List<Tag> AddArgument(this List<Tag> tags, string key, object value) => tags.Add(key, TagType.Argument, value);
@@ -47,46 +49,42 @@ public static class EnterpriseApplicationLogExtensions
         return tags;
     }
 
+    #endregion
+
+    #region Configuration
 
     public static void AddEnterpriseApplicationLog(this WebApplicationBuilder builder, string configurationKey, Mode mode)
     {
+        RabbitMQClientConfiguration rabbitMQClientConfiguration = builder.Configuration.ConfigureWith(configurationKey, new RabbitMQClientConfiguration()).Validate();
+
+        RabbitMQSinkConfiguration rabbitMQSinkConfiguration = new RabbitMQSinkConfiguration();
+
         if (mode == Mode.Integrated)
         {
             builder.Host.UseSerilog((hostBuilderContext, loggerConfiguration) =>
             {
-                loggerConfiguration
-                .Enrich.FromLogContext()
-                .Enrich.FromGlobalLogContext()
-                .WriteTo.RabbitMQ(ConfigureSerilogWithRabbitMQ(configurationKey, hostBuilderContext))
-                .WriteTo.Console();
+                loggerConfiguration.ConfigureSerilog(rabbitMQClientConfiguration, rabbitMQSinkConfiguration);
             });
         }
         else if (mode == Mode.Standalone)
         {
-            RabbitMQClientConfiguration rabbitMQClientConfiguration = builder.Configuration.ConfigureWith(configurationKey, new RabbitMQClientConfiguration()).Validate();
-            RabbitMQSinkConfiguration rabbitMQSinkConfiguration = new RabbitMQSinkConfiguration();
-
             Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .Enrich.FromGlobalLogContext()
-                .WriteTo.RabbitMQ(rabbitMQClientConfiguration, rabbitMQSinkConfiguration, new JsonFormatter())
-                .WriteTo.Console()
+                .ConfigureSerilog(rabbitMQClientConfiguration, rabbitMQSinkConfiguration)
                 .CreateLogger();
         }
     }
 
-    public static Action<RabbitMQClientConfiguration, RabbitMQSinkConfiguration> ConfigureSerilogWithRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext)
-        => (clientConfiguration, sinkConfiguration)
-            => ConfigureSerilogWithRabbitMQ(configurationKey, hostBuilderContext, clientConfiguration, sinkConfiguration);
-
-    public static void ConfigureSerilogWithRabbitMQ(string configurationKey, HostBuilderContext hostBuilderContext, RabbitMQClientConfiguration clientConfiguration, RabbitMQSinkConfiguration sinkConfiguration)
+    private static LoggerConfiguration ConfigureSerilog(this LoggerConfiguration loggerConfiguration, RabbitMQClientConfiguration rabbitMQClientConfiguration, RabbitMQSinkConfiguration rabbitMQSinkConfiguration)
     {
-        hostBuilderContext.Configuration
-                        .ConfigureWith(configurationKey, clientConfiguration)
-                        .Validate();
+        var formatter = new JsonFormatter(closingDelimiter: null, renderMessage: true, formatProvider: null);
 
-        sinkConfiguration.TextFormatter = new JsonFormatter(closingDelimiter: null, renderMessage: true, formatProvider: null);
+        return loggerConfiguration
+                        .Enrich.FromLogContext()
+                        .Enrich.FromGlobalLogContext()
+                        .WriteTo.RabbitMQ(rabbitMQClientConfiguration, rabbitMQSinkConfiguration, formatter)
+                        .WriteTo.Console();
     }
+
 
     public static RabbitMQClientConfiguration Validate(this RabbitMQClientConfiguration clientConfiguration)
     {
@@ -100,6 +98,8 @@ public static class EnterpriseApplicationLogExtensions
 
         return clientConfiguration;
     }
+
+    #endregion
 }
 
 public enum Mode
