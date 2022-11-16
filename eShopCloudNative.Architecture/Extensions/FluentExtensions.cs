@@ -43,4 +43,15 @@ public static class FluentExtensions
 
         return target;
     }
+
+    public static T Fluent<T>(this T target, Action action)
+        where T : class
+    {
+        Guard.Argument(target, nameof(target)).NotNull();
+        Guard.Argument(action, nameof(action)).NotNull();
+
+        action();
+        
+        return target;
+    }
 }

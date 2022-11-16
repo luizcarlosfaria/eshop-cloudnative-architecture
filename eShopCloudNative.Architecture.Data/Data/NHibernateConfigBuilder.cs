@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using NHibernate.Cfg;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics.CodeAnalysis;
+using eShopCloudNative.Architecture.Extensions;
 
 namespace eShopCloudNative.Architecture.Data;
 
@@ -24,34 +25,19 @@ public class NHibernateConfigBuilder
     }
 
     public NHibernateConfigBuilder AddMappingsFromAssemblyOf<T>()
-    {
-        this.typesToFindMapping.Add(typeof(T));
-        return this;
-    }
+        => this.Fluent(() => this.typesToFindMapping.Add(typeof(T)));
 
     public NHibernateConfigBuilder Schema(string schema)
-    {
-        this.schema = schema;
-        return this;
-    }
+        => this.Fluent(() => this.schema = schema);
 
     public NHibernateConfigBuilder ConnectionStringKey(string connectionStringKey)
-    {
-        this.connectionStringKey = connectionStringKey;
-        return this;
-    }
+        => this.Fluent(() => this.connectionStringKey = connectionStringKey);
 
     public NHibernateConfigBuilder RegisterSession()
-    {
-        this.registerSession = true;
-        return this;
-    }
+        => this.Fluent(() => this.registerSession = true);
 
     public NHibernateConfigBuilder RegisterStatelessSession()
-    {
-        this.registerStatelessSession = true;
-        return this;
-    }
+        => this.Fluent(() => this.registerStatelessSession = true);
 
     internal void Build()
     {
