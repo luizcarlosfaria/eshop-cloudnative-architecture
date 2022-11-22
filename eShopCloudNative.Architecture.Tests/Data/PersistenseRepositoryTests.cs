@@ -22,7 +22,7 @@ public class PersistenseRepositoryTests
         var mock = new Mock<ISession>();
         ISession session = mock.Object;
         
-        var persistenseRepository = new PersistenseRepository<TestEntity>(session);
+        var persistenseRepository = new AsyncPersistenseRepository<TestEntity>(session);
         return Task.CompletedTask;
     }
 
@@ -33,7 +33,7 @@ public class PersistenseRepositoryTests
 
         ISession session = mock.Object;
 
-        var persistenseRepository = new PersistenseRepository<TestEntity>(session);
+        var persistenseRepository = new AsyncPersistenseRepository<TestEntity>(session);
 
         var instance = new TestEntity();
 
@@ -49,7 +49,7 @@ public class PersistenseRepositoryTests
 
         ISession session = mock.Object;
 
-        var persistenseRepository = new PersistenseRepository<TestEntity>(session);
+        var persistenseRepository = new AsyncPersistenseRepository<TestEntity>(session);
 
         var instance = new TestEntity();
 
@@ -66,7 +66,7 @@ public class PersistenseRepositoryTests
 
         ISession session = mock.Object;
 
-        var persistenseRepository = new PersistenseRepository<TestEntity>(session);
+        var persistenseRepository = new AsyncPersistenseRepository<TestEntity>(session);
 
         var instance = new TestEntity();
 
