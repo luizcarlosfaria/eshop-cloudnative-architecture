@@ -37,5 +37,5 @@ public class AsyncPersistenseRepository<TEntityBase> where TEntityBase : IEntity
         if (flushImediate) await this.Session.FlushAsync();
     }
 
-    public async Task Flush() => await this.Session.FlushAsync();
+    public async Task FlushAsync() => await this.Session.FlushAsync();
 }
