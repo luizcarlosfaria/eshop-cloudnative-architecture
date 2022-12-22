@@ -18,6 +18,8 @@ public class NHibernateConfigBuilder
     private string connectionStringKey;
     private bool registerSession = false;
     private bool registerStatelessSession = false;
+    private bool showSQL = false;
+    private bool formatSql = false;
 
     public NHibernateConfigBuilder(IServiceCollection services)
     {
@@ -36,6 +38,12 @@ public class NHibernateConfigBuilder
     public NHibernateConfigBuilder RegisterSession()
         => this.Fluent(() => this.registerSession = true);
 
+    public NHibernateConfigBuilder ShowSQL(bool showSQL = true)
+        => this.Fluent(() => this.showSQL = showSQL);
+
+    public NHibernateConfigBuilder FormatSql(bool formatSql = true)
+        => this.Fluent(() => this.formatSql = formatSql);
+
     public NHibernateConfigBuilder RegisterStatelessSession()
         => this.Fluent(() => this.registerStatelessSession = true);
 
@@ -50,7 +58,8 @@ public class NHibernateConfigBuilder
              .Database(
                  PostgreSQLConfiguration.PostgreSQL82
                      .ConnectionString(aspnetConfiguration.GetConnectionString(this.connectionStringKey))
-                     .ShowSql()
+                     .If(it => this.showSQL, it => it.ShowSql())
+                     .If(it => this.formatSql, it => it.FormatSql())
                      .DefaultSchema(this.schema)
                  )
              .Mappings(it =>
