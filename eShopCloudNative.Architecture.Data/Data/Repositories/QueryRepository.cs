@@ -24,8 +24,9 @@ public abstract class QueryRepository<TEntityBase>
 
     protected ISession Session { get; }
 
-    protected IQueryOver<TEntityBase, TEntityBase> QueryOver => this.Session.QueryOver<TEntityBase>();
+    protected virtual IQueryOver<TEntityBase, TEntityBase> QueryOver => this.Session.QueryOver<TEntityBase>();
 
-    protected IQueryable<TEntityBase> Query => this.Session.Query<TEntityBase>();
-    protected ICriteria Criteria => this.Session.CreateCriteria<TEntityBase>();
+    protected virtual IQueryable<TEntityBase> Query => this.Session.Query<TEntityBase>();
+
+    protected virtual ICriteria Criteria => this.Session.CreateCriteria<TEntityBase>();
 }
