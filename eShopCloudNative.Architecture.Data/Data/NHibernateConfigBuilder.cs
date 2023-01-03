@@ -20,6 +20,8 @@ public class NHibernateConfigBuilder
     private bool registerStatelessSession = false;
     private bool showSQL = false;
     private bool formatSql = false;
+    private Action<Configuration> exposeConfigurationAction;
+    private Action<CacheSettingsBuilder> cacheExpression;
 
     public NHibernateConfigBuilder(IServiceCollection services)
     {
@@ -31,6 +33,13 @@ public class NHibernateConfigBuilder
 
     public NHibernateConfigBuilder Schema(string schema)
         => this.Fluent(() => this.schema = schema);
+
+    public NHibernateConfigBuilder ExposeConfiguration(Action<Configuration> exposeConfigurationAction)
+        => this.Fluent(() => this.exposeConfigurationAction = exposeConfigurationAction);
+
+    public NHibernateConfigBuilder Cache(Action<CacheSettingsBuilder> cacheExpression)
+        => this.Fluent(() => this.cacheExpression = cacheExpression);
+
 
     public NHibernateConfigBuilder ConnectionStringKey(string connectionStringKey)
         => this.Fluent(() => this.connectionStringKey = connectionStringKey);
@@ -54,26 +63,37 @@ public class NHibernateConfigBuilder
             var aspnetConfiguration = sp.GetRequiredService<IConfiguration>();
 
             return Fluently
-             .Configure(new NHibernate.Cfg.Configuration().SetNamingStrategy(PostgresNamingStragegy.Instance))
-             .Database(
-                 PostgreSQLConfiguration.PostgreSQL82
-                     .ConnectionString(aspnetConfiguration.GetConnectionString(this.connectionStringKey))
-                     .If(it => this.showSQL, it => it.ShowSql())
-                     .If(it => this.formatSql, it => it.FormatSql())
-                     .DefaultSchema(this.schema)
-                 )
-             .Mappings(it =>
-             {
-                 foreach (var type in this.typesToFindMapping)
-                 {
-                     it.FluentMappings.AddFromAssembly(type.Assembly);
-                 }
-             })
-             .ExposeConfiguration(it => it.SetProperty("hbm2ddl.keywords", "auto-quote"))
-             .BuildSessionFactory();
+                .Configure(new NHibernate.Cfg.Configuration().SetNamingStrategy(PostgresNamingStragegy.Instance))
+                .Database(
+                     PostgreSQLConfiguration.PostgreSQL82
+                         .ConnectionString(aspnetConfiguration.GetConnectionString(this.connectionStringKey))
+                         .If(it => this.showSQL, it => it.ShowSql())
+                         .If(it => this.formatSql, it => it.FormatSql())
+                         .DefaultSchema(this.schema)
+                     )
+                .Mappings(it =>
+                {
+                     foreach (var type in this.typesToFindMapping)
+                     {
+                         it.FluentMappings.AddFromAssembly(type.Assembly);
+                     }
+                })
 
-        });
+                .If(cfg => this.cacheExpression != null, (cfg) => cfg.Cache(this.cacheExpression))
+
+                .ExposeConfiguration(cfg => 
+
+                    cfg.SetProperty("hbm2ddl.keywords", "auto-quote")
+
+                    .If( _ => this.exposeConfigurationAction != null, cfg2 => this.exposeConfigurationAction(cfg2))
+
+                )
+                 .BuildSessionFactory();
+
+            });
+
         if (this.registerSession) this.services.AddSession();
+
         if (this.registerStatelessSession) this.services.AddStatelessSession();
 
     }
