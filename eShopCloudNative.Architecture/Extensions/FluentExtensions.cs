@@ -26,6 +26,20 @@ public static class FluentExtensions
         return target;
     }
 
+    public static T2 IfTransform<T1, T2>(this T1 target, Func<T1, bool> condition, Func<T1, T2> actionWhenTrue, Func<T1, T2> actionWhenFalse = null)
+    {
+        Guard.Argument(condition).NotNull();
+        Guard.Argument(actionWhenTrue).NotNull();
+        Guard.Argument(actionWhenFalse).NotNull();
+
+        bool conditionResult = condition(target);
+
+        if (conditionResult)
+            return actionWhenTrue(target);
+        else
+            return actionWhenFalse(target);
+    }
+
     public static T If<T>(this T target, Func<T, bool> condition, Action<T> actionWhenTrue, Action<T> actionWhenFalse = null)
     {
         Guard.Argument(condition, nameof(condition)).NotNull();
@@ -43,6 +57,7 @@ public static class FluentExtensions
 
         return target;
     }
+
 
     public static T Fluent<T>(this T target, Action action)
         where T : class
