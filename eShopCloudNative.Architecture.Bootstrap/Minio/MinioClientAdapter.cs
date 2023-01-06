@@ -39,7 +39,7 @@ public class MinioClientAdapter : IMinioClientAdapter
         this.minioClient = new MinioClient()
             .WithEndpoint(serverEndpoint.Host, serverEndpoint.Port)
             .WithCredentials(credentials.UserName, credentials.Password)
-            .If(it => withSSL, it => it.WithSSL())
+            .IfFunction(it => withSSL, it => it.WithSSL())
             .Build();
     }
 

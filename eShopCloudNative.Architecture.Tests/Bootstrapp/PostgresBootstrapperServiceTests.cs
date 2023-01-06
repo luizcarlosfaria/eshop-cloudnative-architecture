@@ -2,6 +2,7 @@
 using FluentMigrator.Runner;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NHibernate.Linq.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -76,13 +77,25 @@ public class PostgresBootstrapperServiceTests
             //MigrationType = migrationType,
         };
 
+        var paramListMock = new Mock<IDataParameterCollection>();
+        paramListMock.Setup(it => it.Add(It.IsAny<IDbDataParameter>())).Returns(1);
+
+        var paramMock = new Mock<IDbDataParameter>();
+        paramMock.SetupAllProperties();
+
         var createAppUserIDbCommandMock = new Mock<IDbCommand>();
         createAppUserIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(1L);
+        createAppUserIDbCommandMock.Setup(it => it.CreateParameter()).Returns(paramMock.Object);
+        createAppUserIDbCommandMock.SetupGet(it => it.Parameters).Returns(paramListMock.Object);
 
         var createDatabaseIDbCommandMock = new Mock<IDbCommand>();
         createDatabaseIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(1L);
+        createDatabaseIDbCommandMock.Setup(it => it.CreateParameter()).Returns(paramMock.Object);
+        createDatabaseIDbCommandMock.SetupGet(it => it.Parameters).Returns(paramListMock.Object);
 
         var setPermissionsIDbCommandMock = new Mock<IDbCommand>();
+        setPermissionsIDbCommandMock.Setup(it => it.CreateParameter()).Returns(paramMock.Object);
+        setPermissionsIDbCommandMock.SetupGet(it => it.Parameters).Returns(paramListMock.Object);
 
         svc.DbConnectionMock.SetupSequence(it => it.CreateCommand())
             .Returns(createAppUserIDbCommandMock.Object)
@@ -116,14 +129,28 @@ public class PostgresBootstrapperServiceTests
             Configuration = configurationInstance,
             //MigrationType = migrationType,
         };
+        var paramListMock = new Mock<IDataParameterCollection>();
+        paramListMock.Setup(it => it.Add(It.IsAny<IDbDataParameter>())).Returns(1);
+
+        var paramMock = new Mock<IDbDataParameter>();
+        paramMock.SetupAllProperties();
+
 
         var createAppUserIDbCommandMock = new Mock<IDbCommand>();
         createAppUserIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0L);
+        createAppUserIDbCommandMock.Setup(it => it.CreateParameter()).Returns(paramMock.Object);
+        createAppUserIDbCommandMock.SetupGet(it => it.Parameters).Returns(paramListMock.Object);
 
         var createDatabaseIDbCommandMock = new Mock<IDbCommand>();
         createDatabaseIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0L);
+        createDatabaseIDbCommandMock.Setup(it => it.CreateParameter()).Returns(paramMock.Object);
+        createDatabaseIDbCommandMock.SetupGet(it => it.Parameters).Returns(paramListMock.Object);
+
 
         var setPermissionsIDbCommandMock = new Mock<IDbCommand>();
+        setPermissionsIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0L);
+        setPermissionsIDbCommandMock.Setup(it => it.CreateParameter()).Returns(paramMock.Object);
+        setPermissionsIDbCommandMock.SetupGet(it => it.Parameters).Returns(paramListMock.Object);
 
         svc.DbConnectionMock.SetupSequence(it => it.CreateCommand())
             .Returns(createAppUserIDbCommandMock.Object)
@@ -161,14 +188,26 @@ public class PostgresBootstrapperServiceTests
             MigrationType = this.GetType(),
         };
 
+        var paramListMock = new Mock<IDataParameterCollection>();
+        paramListMock.Setup(it => it.Add(It.IsAny<IDbDataParameter>())).Returns(1);
+
+        var paramMock = new Mock<IDbDataParameter>();
+        paramMock.SetupAllProperties();
+
 
         var createAppUserIDbCommandMock = new Mock<IDbCommand>();
         createAppUserIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0L);
+        createAppUserIDbCommandMock.Setup(it => it.CreateParameter()).Returns(paramMock.Object);
+        createAppUserIDbCommandMock.SetupGet(it => it.Parameters).Returns(paramListMock.Object);
 
         var createDatabaseIDbCommandMock = new Mock<IDbCommand>();
         createDatabaseIDbCommandMock.Setup(it => it.ExecuteScalar()).Returns(0L);
+        createDatabaseIDbCommandMock.Setup(it => it.CreateParameter()).Returns(paramMock.Object);
+        createDatabaseIDbCommandMock.SetupGet(it => it.Parameters).Returns(paramListMock.Object);
 
         var setPermissionsIDbCommandMock = new Mock<IDbCommand>();
+        setPermissionsIDbCommandMock.Setup(it => it.CreateParameter()).Returns(paramMock.Object);
+        setPermissionsIDbCommandMock.SetupGet(it => it.Parameters).Returns(paramListMock.Object);
 
         svc.DbConnectionMock.SetupSequence(it => it.CreateCommand())
             .Returns(createAppUserIDbCommandMock.Object)
@@ -212,7 +251,7 @@ public class PostgresTestService : PostgresBootstrapperService
 
     private IServiceProvider serviceProvider;
     protected override IServiceProvider BuildServiceProviderForMigration() => this.serviceProvider;
-    
+
 
     public PostgresTestService(IServiceProvider serviceProvider = null)
     {
@@ -220,7 +259,7 @@ public class PostgresTestService : PostgresBootstrapperService
         this.serviceProvider = serviceProvider;
     }
 
-    
+
 
 
 }

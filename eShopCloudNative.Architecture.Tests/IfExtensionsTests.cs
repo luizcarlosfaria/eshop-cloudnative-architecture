@@ -21,16 +21,16 @@ public class Extensions_IF_Tests
     public void FluentIfTrueTests()
     {
         //Func<> 
-        Assert.True(true.If(it => true, it => true, it => false));
-        Assert.False(true.If(it => false, it => true, it => false));
+        Assert.True(true.IfFunction(it => true, it => true, it => false));
+        Assert.False(true.IfFunction(it => false, it => true, it => false));
 
         //Actions
         {
             bool? value1 = null;
 
-            true.If(it => true, it => { value1 = true; }, it => { value1 = false; }).Should().BeTrue();
+            true.IfAction(it => true, it => { value1 = true; }, it => { value1 = false; }).Should().BeTrue();
 
-            ((object)null).If(it => true, it => { value1 = true; }, it => { value1 = false; }).Should().BeNull();
+            ((object)null).IfAction(it => true, it => { value1 = true; }, it => { value1 = false; }).Should().BeNull();
 
             Assert.True(value1);
         }
@@ -38,7 +38,7 @@ public class Extensions_IF_Tests
         {
             bool? value2 = null;
 
-            true.If(it => false, it => { value2 = true; }, it => { value2 = false; });
+            true.IfAction(it => false, it => { value2 = true; }, it => { value2 = false; });
 
             Assert.False(value2);
         }
@@ -48,11 +48,11 @@ public class Extensions_IF_Tests
     public void FluentIfFalseTests()
     {
         bool?  value1 = null;
-        new List<string>().If(it => false, it => value1 = true, it => value1 = false);
+        new List<string>().IfAction(it => false, it => value1 = true, it => value1 = false);
         value1.Should().Be(false);
 
         bool? value2 = null;
-        new List<string>().If(it => false, it => value2 = true, it => value2 = false);
+        new List<string>().IfAction(it => false, it => value2 = true, it => value2 = false);
         value2.Should().Be(false);
     }
 
@@ -62,11 +62,11 @@ public class Extensions_IF_Tests
         object objectNull = null;
         object objectNotNull = new object();
 
-        Assert.Throws<ArgumentNullException>(() => objectNull.If(null, null, null));
+        Assert.Throws<ArgumentNullException>(() => objectNull.IfAction(null, null, null));
 
-        Assert.Throws<ArgumentNullException>(() => objectNotNull.If(null, null, null));
+        Assert.Throws<ArgumentNullException>(() => objectNotNull.IfAction(null, null, null));
 
-        Assert.Throws<ArgumentNullException>(() => objectNotNull.If((it) => true, null, null));
+        Assert.Throws<ArgumentNullException>(() => objectNotNull.IfAction((it) => true, null, null));
 
     }
 
@@ -76,11 +76,11 @@ public class Extensions_IF_Tests
         bool? value = null;
         IFormattable objectNull = null;
 
-        objectNull.If(it => false, it => value = true, it => value = false).Should().BeNull();
+        objectNull.IfAction(it => false, it => value = true, it => value = false).Should().BeNull();
 
         value.Should().BeNull();
 
-        ((object)null).If(it => false, it => "A", it => "B").Should().BeNull();
+        ((object)null).IfFunction(it => false, it => "A", it => "B").Should().BeNull();
     }
 
     [Fact]
@@ -90,8 +90,8 @@ public class Extensions_IF_Tests
         object objectA = new();
         object objectB = new();
 
-        object_.If(it => false, it => objectA, it => objectB).Should().Be(objectB);
-        object_.If(it => true, it => objectA, it => objectB).Should().Be(objectA);
+        object_.IfFunction(it => false, it => objectA, it => objectB).Should().Be(objectB);
+        object_.IfFunction(it => true, it => objectA, it => objectB).Should().Be(objectA);
     }
 
 }

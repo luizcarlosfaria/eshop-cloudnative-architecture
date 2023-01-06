@@ -67,8 +67,8 @@ public class NHibernateConfigBuilder
                 .Database(
                      PostgreSQLConfiguration.PostgreSQL82
                          .ConnectionString(aspnetConfiguration.GetConnectionString(this.connectionStringKey))
-                         .If(it => this.showSQL, it => it.ShowSql())
-                         .If(it => this.formatSql, it => it.FormatSql())
+                         .IfFunction(it => this.showSQL, it => it.ShowSql())
+                         .IfFunction(it => this.formatSql, it => it.FormatSql())
                          .DefaultSchema(this.schema)
                      )
                 .Mappings(it =>
@@ -79,13 +79,13 @@ public class NHibernateConfigBuilder
                      }
                 })
 
-                .If(cfg => this.cacheExpression != null, (cfg) => cfg.Cache(this.cacheExpression))
+                .IfFunction(cfg => this.cacheExpression != null, (cfg) => cfg.Cache(this.cacheExpression))
 
                 .ExposeConfiguration(cfg => 
 
                     cfg.SetProperty("hbm2ddl.keywords", "auto-quote")
 
-                    .If( _ => this.exposeConfigurationAction != null, cfg2 => this.exposeConfigurationAction(cfg2))
+                    .IfAction( _ => this.exposeConfigurationAction != null, cfg2 => this.exposeConfigurationAction(cfg2))
 
                 )
                  .BuildSessionFactory();
