@@ -25,6 +25,13 @@ public class AsyncPersistenseRepository<TEntityBase> where TEntityBase : IEntity
         if (flushImediate) await this.Session.FlushAsync();
     }
 
+    public virtual async Task SaveOrUpdateAsync(TEntityBase entity, bool flushImediate = false)
+    {
+        await this.Session.SaveOrUpdateAsync(entity);
+        if (flushImediate) await this.Session.FlushAsync();
+    }
+
+
     public virtual async Task UpdateAsync(TEntityBase entity, bool flushImediate = false)
     {
         await this.Session.UpdateAsync(entity); 

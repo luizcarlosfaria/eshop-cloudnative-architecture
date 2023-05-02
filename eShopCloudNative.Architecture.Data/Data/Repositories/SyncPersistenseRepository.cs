@@ -25,6 +25,12 @@ public class SyncPersistenseRepository<TEntityBase> where TEntityBase : IEntity
         if (flushImediate) this.Session.Flush();
     }
 
+    public virtual void SaveOrUpdate(TEntityBase entity, bool flushImediate = false)
+    {
+        this.Session.SaveOrUpdate(entity);
+        if (flushImediate) this.Session.Flush();
+    }
+
     public virtual void Update(TEntityBase entity, bool flushImediate = false)
     {
         this.Session.Update(entity);
