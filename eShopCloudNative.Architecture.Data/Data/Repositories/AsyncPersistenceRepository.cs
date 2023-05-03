@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using NH = NHibernate;
 
 namespace eShopCloudNative.Architecture.Data.Repositories;
-public class AsyncPersistenseRepository<TEntityBase> where TEntityBase : IEntity
+public class AsyncPersistenceRepository<TEntityBase> where TEntityBase : IEntity
 {
 
-    public AsyncPersistenseRepository(ISession session)
+    public AsyncPersistenceRepository(ISession session)
     {
         this.Session = session;
     }

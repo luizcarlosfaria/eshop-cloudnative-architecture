@@ -14,7 +14,7 @@ public class TestEntity : IEntity
 
 }
 
-public class PersistenseRepositoryTests
+public class PersistenceRepositoryTests
 {
     [Fact]
     public Task ConstructorTest()
@@ -22,7 +22,7 @@ public class PersistenseRepositoryTests
         var mock = new Mock<ISession>();
         ISession session = mock.Object;
         
-        var persistenseRepository = new AsyncPersistenseRepository<TestEntity>(session);
+        var persistenceRepository = new AsyncPersistenceRepository<TestEntity>(session);
         return Task.CompletedTask;
     }
 
@@ -33,11 +33,11 @@ public class PersistenseRepositoryTests
 
         ISession session = mock.Object;
 
-        var persistenseRepository = new AsyncPersistenseRepository<TestEntity>(session);
+        var persistenceRepository = new AsyncPersistenceRepository<TestEntity>(session);
 
         var instance = new TestEntity();
 
-        await persistenseRepository.SaveAsync(instance);
+        await persistenceRepository.SaveAsync(instance);
 
         mock.Verify(x => x.SaveAsync(It.Is<TestEntity>(it => it == instance), It.IsAny<CancellationToken>()), Times.Once());
     }
@@ -49,11 +49,11 @@ public class PersistenseRepositoryTests
 
         ISession session = mock.Object;
 
-        var persistenseRepository = new AsyncPersistenseRepository<TestEntity>(session);
+        var persistenceRepository = new AsyncPersistenceRepository<TestEntity>(session);
 
         var instance = new TestEntity();
 
-        await persistenseRepository.UpdateAsync(instance);
+        await persistenceRepository.UpdateAsync(instance);
 
         mock.Verify(x => x.UpdateAsync(It.Is<TestEntity>(it => it == instance), It.IsAny<CancellationToken>()), Times.Once());
 
@@ -66,11 +66,11 @@ public class PersistenseRepositoryTests
 
         ISession session = mock.Object;
 
-        var persistenseRepository = new AsyncPersistenseRepository<TestEntity>(session);
+        var persistenceRepository = new AsyncPersistenceRepository<TestEntity>(session);
 
         var instance = new TestEntity();
 
-        await persistenseRepository.DeleteAsync(instance);
+        await persistenceRepository.DeleteAsync(instance);
 
         mock.Verify(x => x.DeleteAsync(It.Is<TestEntity>(it => it == instance), It.IsAny<CancellationToken>()), Times.Once());
     }
