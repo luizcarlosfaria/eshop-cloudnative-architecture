@@ -19,29 +19,29 @@ public class AsyncPersistenceRepository<TEntityBase> where TEntityBase : IEntity
     protected ISession Session { get; }
 
 
-    public virtual async Task SaveAsync(TEntityBase entity, bool flushImediate = false)
+    public virtual async Task SaveAsync(TEntityBase entity, bool flushImmediate = false)
     {
         await this.Session.SaveAsync(entity);
-        if (flushImediate) await this.Session.FlushAsync();
+        if (flushImmediate) await this.Session.FlushAsync();
     }
 
-    public virtual async Task SaveOrUpdateAsync(TEntityBase entity, bool flushImediate = false)
+    public virtual async Task SaveOrUpdateAsync(TEntityBase entity, bool flushImmediate = false)
     {
         await this.Session.SaveOrUpdateAsync(entity);
-        if (flushImediate) await this.Session.FlushAsync();
+        if (flushImmediate) await this.Session.FlushAsync();
     }
 
 
-    public virtual async Task UpdateAsync(TEntityBase entity, bool flushImediate = false)
+    public virtual async Task UpdateAsync(TEntityBase entity, bool flushImmediate = false)
     {
         await this.Session.UpdateAsync(entity); 
-        if (flushImediate) await this.Session.FlushAsync();
+        if (flushImmediate) await this.Session.FlushAsync();
     }
 
-    public virtual async Task DeleteAsync(TEntityBase entity, bool flushImediate = false)
+    public virtual async Task DeleteAsync(TEntityBase entity, bool flushImmediate = false)
     {
         await this.Session.DeleteAsync(entity);
-        if (flushImediate) await this.Session.FlushAsync();
+        if (flushImmediate) await this.Session.FlushAsync();
     }
 
     public virtual async Task FlushAsync() => await this.Session.FlushAsync();

@@ -19,28 +19,28 @@ public class SyncPersistenceRepository<TEntityBase> where TEntityBase : IEntity
     protected ISession Session { get; }
 
 
-    public virtual void Save(TEntityBase entity, bool flushImediate = false)
+    public virtual void Save(TEntityBase entity, bool flushImmediate = false)
     {
         this.Session.Save(entity);
-        if (flushImediate) this.Session.Flush();
+        if (flushImmediate) this.Session.Flush();
     }
 
-    public virtual void SaveOrUpdate(TEntityBase entity, bool flushImediate = false)
+    public virtual void SaveOrUpdate(TEntityBase entity, bool flushImmediate = false)
     {
         this.Session.SaveOrUpdate(entity);
-        if (flushImediate) this.Session.Flush();
+        if (flushImmediate) this.Session.Flush();
     }
 
-    public virtual void Update(TEntityBase entity, bool flushImediate = false)
+    public virtual void Update(TEntityBase entity, bool flushImmediate = false)
     {
         this.Session.Update(entity);
-        if (flushImediate) this.Session.Flush();
+        if (flushImmediate) this.Session.Flush();
     }
 
-    public virtual void Delete(TEntityBase entity, bool flushImediate = false)
+    public virtual void Delete(TEntityBase entity, bool flushImmediate = false)
     {
         this.Session.Delete(entity);
-        if (flushImediate) this.Session.Flush();
+        if (flushImmediate) this.Session.Flush();
     }
 
     public virtual void Flush() => this.Session.Flush();
