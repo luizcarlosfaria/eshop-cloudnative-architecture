@@ -94,9 +94,7 @@ public class PostgresBootstrapperService : IBootstrapperService
 
         using var command = connection.CreateCommand();
 
-        command.CommandText = @$"SELECT count(rolname) FROM pg_catalog.pg_roles WHERE  rolname = @username";
-
-        command.CreateAndAddParameter(DbType.String, "username", this.AppUser.UserName);
+        command.CommandText = @$"SELECT count(rolname) FROM pg_catalog.pg_roles WHERE  rolname = '{this.AppUser.UserName}'";
 
         long qtd = (long) command.ExecuteScalar();
 
@@ -105,7 +103,7 @@ public class PostgresBootstrapperService : IBootstrapperService
             Log.Information($"{nameof(PostgresBootstrapperService)} Criando usuário '{this.AppUser.UserName}'...");
 
             command.CommandText = @$"
-                    CREATE ROLE @username WITH
+                    CREATE ROLE {this.AppUser.UserName} WITH
 	                    LOGIN
 	                    NOSUPERUSER
 	                    NOCREATEDB
@@ -113,10 +111,8 @@ public class PostgresBootstrapperService : IBootstrapperService
 	                    INHERIT
 	                    NOREPLICATION
 	                    CONNECTION LIMIT -1
-	                    PASSWORD @password; ";
+	                    PASSWORD '{this.AppUser.Password}'; ";
 
-            command.CreateAndAddParameter(DbType.String, "username", this.AppUser.UserName);
-            command.CreateAndAddParameter(DbType.String, "password", this.AppUser.Password);
             command.ExecuteNonQuery();
 
             Log.Information($"{nameof(PostgresBootstrapperService)} Usuário '{this.AppUser.UserName}' criado com sucesso!!");
@@ -133,8 +129,8 @@ public class PostgresBootstrapperService : IBootstrapperService
 
         using var command = connection.CreateCommand();
 
-        command.CommandText = @$"SELECT count(datname) FROM pg_database WHERE datname = @databaseName ";
-        command.CreateAndAddParameter(DbType.String, "databaseName", this.DatabaseToCreate);
+        command.CommandText = @$"SELECT count(datname) FROM pg_database WHERE datname = '{this.DatabaseToCreate}'";
+
         long qtd = (long) command.ExecuteScalar();
 
         if (qtd == 0)
@@ -142,14 +138,12 @@ public class PostgresBootstrapperService : IBootstrapperService
             Log.Information($"{nameof(PostgresBootstrapperService)} Criando DATABASE '{this.DatabaseToCreate}'...");
 
             command.CommandText = @$"
-                        CREATE DATABASE @databaseName
+                        CREATE DATABASE {this.DatabaseToCreate} 
                             WITH 
-                            OWNER = @username
+                            OWNER = {this.AppUser.UserName}
                             ENCODING = 'UTF8'
                             CONNECTION LIMIT = -1; ";
 
-            command.CreateAndAddParameter(DbType.String, "databaseName", this.DatabaseToCreate);
-            command.CreateAndAddParameter(DbType.String, "username", this.AppUser.UserName);
             command.ExecuteNonQuery();
 
             Log.Information($"{nameof(PostgresBootstrapperService)} DATABASE '{this.DatabaseToCreate}' criado com sucesso!!");
@@ -167,14 +161,12 @@ public class PostgresBootstrapperService : IBootstrapperService
 
         using var command = connection.CreateCommand();
 
-        command.CommandText = $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA @schema TO @username;";
-        command.CreateAndAddParameter(DbType.String, "schema", this.SchemaToSetPermissions);
-        command.CreateAndAddParameter(DbType.String, "username", this.AppUser.UserName);
+        command.CommandText = $"GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA {this.SchemaToSetPermissions} TO {this.AppUser.UserName};";
+
         command.ExecuteNonQuery();
 
-        command.CommandText = $"GRANT UPDATE, USAGE, SELECT ON ALL SEQUENCES IN SCHEMA @schema TO @username;";
-        command.CreateAndAddParameter(DbType.String, "schema", this.SchemaToSetPermissions);
-        command.CreateAndAddParameter(DbType.String, "username", this.AppUser.UserName);
+        command.CommandText = $"GRANT UPDATE, USAGE, SELECT ON ALL SEQUENCES IN SCHEMA {this.SchemaToSetPermissions} TO {this.AppUser.UserName};";
+
         command.ExecuteNonQuery();
 
         Log.Information($"{nameof(PostgresBootstrapperService)} Permissões a Sequences e Tabelas concedidas ao usuário '{this.AppUser.UserName}' no schema '{this.SchemaToSetPermissions}'... ");
@@ -243,38 +235,4 @@ public class PostgresBootstrapperService : IBootstrapperService
 
     [ExcludeFromCodeCoverage]
     protected void ConfigureOptions(RunnerOptions runnerOptions) => runnerOptions.Tags = new[] { "blue" };
-}
-
-[VersionTableMetaData]
-public class CustomVersionTableMetaData : IVersionTableMetaData
-{
-    public virtual string SchemaName { get; set; } = "";
-
-    public virtual string TableName { get; set; } = "_VersionInfo";
-
-    public virtual string ColumnName { get; set; } = "Version";
-
-    public virtual string UniqueIndexName { get; set; } = "UC_Version";
-
-    public virtual string AppliedOnColumnName { get; set; } = "AppliedOn";
-
-    public virtual string DescriptionColumnName { get; set; } = "Description";
-
-    public virtual bool OwnsSchema => false;
-
-    public object ApplicationContext { get; set; }
-
-}
-
-
-public static class BootstrapExtensions
-{
-    public static void CreateAndAddParameter(this IDbCommand command,DbType type,  string parameterName, object? value)
-    {
-        var parameter = command.CreateParameter();
-        parameter.ParameterName = "username";
-        parameter.DbType = type;
-        parameter.Value = value;
-        command.Parameters.Add(parameter);
-    }
 }
