@@ -38,8 +38,7 @@ public static class FluentExtensions
 
         if (conditionResult)
             actionWhenTrue(target);
-        else if (actionWhenFalse != null)
-            actionWhenFalse(target);
+        else actionWhenFalse?.Invoke(target);
 
         return target;
     }

@@ -1,4 +1,6 @@
-﻿namespace eShopCloudNative.Architecture.Logging;
+﻿using Dawn;
+
+namespace eShopCloudNative.Architecture.Logging;
 
 public class Tag
 {
@@ -10,6 +12,7 @@ public class Tag
 
     public Tag(string key, TagType tagType = TagType.None, object value = default)
     {
+        Guard.Argument(key).NotNull().NotEmpty().NotWhiteSpace();
         this.Key = key;
         this.Type = tagType; 
         this.Value = value;

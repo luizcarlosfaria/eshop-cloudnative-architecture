@@ -4,8 +4,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <RootNamespace>eShopCloudNative.Architecture</RootNamespace>
+        <AnalysisLevel>preview-all</AnalysisLevel>
     </PropertyGroup>
-
     <PropertyGroup>
         <Authors>luizcarlosfaria</Authors>
         <Company>gaGO.io | Cloud Native .NET</Company>
