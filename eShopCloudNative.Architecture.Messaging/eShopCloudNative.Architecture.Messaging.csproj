@@ -2,9 +2,11 @@
 
     <Import Project="./../eShopCloudNative.Architecture.targets" />
 
-  <ItemGroup>
-    <Folder Include="Messaging\" />
-  </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <PackageReference Include="Polly" Version="7.2.3" />
+      <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
+    </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\eShopCloudNative.Architecture\eShopCloudNative.Architecture.csproj" />
