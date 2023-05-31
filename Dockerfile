@@ -10,7 +10,7 @@ RUN apt-get update && \
     ca-certificates \
     ca-certificates-java \
     openjdk-17-jre-headless \
-    dotnet6 \
+    dotnet7 \
     && rm -rf /var/lib/apt/lists/*
 ENV LANG C.UTF-8
 
