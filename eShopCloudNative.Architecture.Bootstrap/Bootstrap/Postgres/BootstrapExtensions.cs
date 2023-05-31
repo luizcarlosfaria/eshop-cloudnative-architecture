@@ -4,7 +4,7 @@ namespace eShopCloudNative.Architecture.Bootstrap.Postgres;
 
 public static class BootstrapExtensions
 {
-    public static void CreateAndAddParameter(this IDbCommand command,DbType type,  string parameterName, object? value)
+    public static void CreateAndAddParameter(this IDbCommand command,DbType type,  string parameterName, object value)
     {
         var parameter = command.CreateParameter();
         parameter.ParameterName = "username";
