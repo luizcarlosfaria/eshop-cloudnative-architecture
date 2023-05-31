@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace eShopCloudNative.Catalog.Entities;
+namespace eShopCloudNative.Architecture.Entities;
 public interface IEntity
 {
 }
