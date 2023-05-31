@@ -95,7 +95,8 @@ pipeline {
 						'./eShopCloudNative.Architecture/eShopCloudNative.Architecture.csproj',
                         './eShopCloudNative.Architecture.Bootstrap/eShopCloudNative.Architecture.Bootstrap.csproj',
                         './eShopCloudNative.Architecture.Data/eShopCloudNative.Architecture.Data.csproj',
-                        './eShopCloudNative.Architecture.WebApi/eShopCloudNative.Architecture.WebApi.csproj'
+                        './eShopCloudNative.Architecture.WebApi/eShopCloudNative.Architecture.WebApi.csproj',
+                        './eShopCloudNative.Architecture.Messaging/eShopCloudNative.Architecture.Messaging.csproj'
                     ]
                     
 
