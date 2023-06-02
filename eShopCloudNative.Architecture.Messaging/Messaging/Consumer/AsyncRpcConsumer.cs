@@ -1,7 +1,9 @@
 using Dawn;
+using eShopCloudNative.Architecture.Extensions;
 using eShopCloudNative.Architecture.Messaging;
 using eShopCloudNative.Architecture.Messaging.Consumer.Actions;
 using eShopCloudNative.Architecture.Messaging.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -10,12 +12,17 @@ using System.Diagnostics;
 namespace eShopCloudNative.Architecture.Messaging.Consumer;
 
 
-public class AsyncRpcConsumer<TRequest, TResponse> : AsyncQueueConsumer<TRequest, Task<TResponse>>
+public class AsyncRpcConsumer<TService, TRequest, TResponse> : AsyncQueueConsumer<TService, TRequest, Task<TResponse>>
     where TResponse : class
     where TRequest : class
 {
-    public AsyncRpcConsumer(ILogger logger, IConnection connection, IAMQPSerializer serializer, ActivitySource activitySource, string queueName, ushort prefetchCount, Func<TRequest, Task<TResponse>> dispatchFunc) : base(logger, connection, serializer, activitySource, queueName, prefetchCount, dispatchFunc)
+    private AsyncQueueConsumerParameters<TService, TRequest, Task<TResponse>> parameters;
+
+    public AsyncRpcConsumer(ILogger logger, AsyncQueueConsumerParameters<TService, TRequest, Task<TResponse>> parameters) 
+        : base(logger, parameters)
     {
+        this.parameters = Guard.Argument(parameters).NotNull().Value;
+        this.parameters.Validate();
     }
 
     protected override async Task<IAMQPResult> Dispatch(BasicDeliverEventArgs receivedItem, Activity receiveActivity, TRequest request)
@@ -24,7 +31,7 @@ public class AsyncRpcConsumer<TRequest, TResponse> : AsyncQueueConsumer<TRequest
         Guard.Argument(receiveActivity).NotNull();
         Guard.Argument(request).NotNull();
 
-        using Activity dispatchActivity = this.activitySource.SafeStartActivity($"{nameof(AsyncRpcConsumer<TRequest, TResponse>)}.Dispatch", ActivityKind.Internal, receiveActivity.Context);
+        using Activity dispatchActivity = this.parameters.ActivitySource.SafeStartActivity($"{nameof(AsyncRpcConsumer<TService, TRequest, TResponse>)}.Dispatch", ActivityKind.Internal, receiveActivity.Context);
 
         if (receivedItem.BasicProperties.ReplyTo == null)
         {
@@ -37,13 +44,23 @@ public class AsyncRpcConsumer<TRequest, TResponse> : AsyncQueueConsumer<TRequest
 
         try
         {
-            responsePayload = await this.dispatchFunc(request);
+            if (this.parameters.DispatchScope == DispatchScope.RootScope)
+            {
+                responsePayload = await this.parameters.AdapterFunc(this.parameters.ServiceProvider.GetRequiredService<TService>(), request);
+            }
+            else if (this.parameters.DispatchScope == DispatchScope.ChildScope)
+            {
+                using (var scope = this.parameters.ServiceProvider.CreateScope())
+                {
+                    responsePayload = await this.parameters.AdapterFunc(scope.ServiceProvider.GetRequiredService<TService>(), request);
+                }
+            }
         }
         catch (Exception ex)
         {
-            this.SendReply(receivedItem, receiveActivity, ex);
+            this.SendReply(receivedItem, receiveActivity, null, ex);
 
-            return new NackResult(false);
+            return new NackResult(this.parameters.RequeueOnCrash);
         }
 
         dispatchActivity?.SetEndTime(DateTime.UtcNow);
@@ -53,15 +70,18 @@ public class AsyncRpcConsumer<TRequest, TResponse> : AsyncQueueConsumer<TRequest
         return new AckResult();
     }
 
-    private void SendReply(BasicDeliverEventArgs receivedItem, Activity receiveActivity, TResponse responsePayload)
+    private void SendReply(BasicDeliverEventArgs receivedItem, Activity receiveActivity, TResponse responsePayload = null, Exception exception = null)
     {
-        if (receivedItem is null) throw new ArgumentNullException(nameof(receivedItem));
-        if (responsePayload is null) throw new ArgumentNullException(nameof(responsePayload));
+        Guard.Argument(receivedItem).NotNull();
+        Guard.Argument(receiveActivity).NotNull();
+        Guard.Argument(responsePayload).NotNull();
 
-        using Activity replyActivity = this.activitySource.SafeStartActivity($"{nameof(AsyncRpcConsumer<TRequest, TResponse>)}.Reply", ActivityKind.Client, receiveActivity.Context);
+        using Activity replyActivity = this.parameters.ActivitySource.SafeStartActivity($"{nameof(AsyncRpcConsumer<TService, TRequest, TResponse>)}.Reply", ActivityKind.Client, receiveActivity.Context);
+
 
         IBasicProperties responseProperties = this.Model.CreateBasicProperties()
                                                         .SetMessageId()
+                                                        .IfFunction(it => exception != null, it => it.SetException(exception))
                                                         .SetTelemetry(replyActivity)
                                                         .SetCorrelationId(receivedItem.BasicProperties);
 
@@ -69,31 +89,13 @@ public class AsyncRpcConsumer<TRequest, TResponse> : AsyncQueueConsumer<TRequest
         replyActivity?.AddTag("MessageId", responseProperties.MessageId);
         replyActivity?.AddTag("CorrelationId", responseProperties.CorrelationId);
 
-        this.Model.BasicPublish(string.Empty, receivedItem.BasicProperties.ReplyTo, responseProperties, this.serializer.Serialize(responseProperties, responsePayload));
-
-        replyActivity?.SetEndTime(DateTime.UtcNow);
-    }
-
-    private void SendReply(BasicDeliverEventArgs receivedItem, Activity receiveActivity, Exception exception)
-    {
-        if (receivedItem is null) throw new ArgumentNullException(nameof(receivedItem));
-        if (exception is null) throw new ArgumentNullException(nameof(exception));
-
-        using Activity replyActivity = this.activitySource.SafeStartActivity($"{nameof(AsyncRpcConsumer<TRequest, TResponse>)}.Reply", ActivityKind.Client, receiveActivity.Context);
-
-        replyActivity?.AddTag("Queue", receivedItem.BasicProperties.ReplyTo);
-
-        IBasicProperties responseProperties = this.Model.CreateBasicProperties()
-                                                        .SetMessageId()
-                                                        .SetException(exception)
-                                                        .SetTelemetry(replyActivity)
-                                                        .SetCorrelationId(receivedItem.BasicProperties);
-
-        replyActivity?.AddTag("MessageId", responseProperties.MessageId);
-
-        replyActivity?.AddTag("CorrelationId", responseProperties.CorrelationId);
-
-        this.Model.BasicPublish(string.Empty, receivedItem.BasicProperties.ReplyTo, responseProperties, Array.Empty<byte>());
+        this.Model.BasicPublish(string.Empty, 
+            receivedItem.BasicProperties.ReplyTo, 
+            responseProperties,
+            exception != null 
+                ? Array.Empty<byte>() 
+                : this.parameters.Serializer.Serialize(responseProperties, responsePayload)
+        );
 
         replyActivity?.SetEndTime(DateTime.UtcNow);
     }

@@ -1,10 +1,11 @@
-﻿
-using eShopCloudNative.Architecture.Messaging.Consumer;
+﻿using eShopCloudNative.Architecture.Messaging;
 using eShopCloudNative.Architecture.Messaging.Serialization;
+using FluentAssertions.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Minio;
 using RabbitMQ.Client;
 using System;
@@ -84,13 +85,22 @@ public class DependencyInjectionTests
         var mockSerializer= new Mock<IAMQPSerializer>();
 
         ServiceCollection services = new ServiceCollection();
+        services.AddLogging();
         services.AddSingleton(mockConnection.Object);
         services.AddSingleton(mockSerializer.Object);
         services.AddSingleton(new ActivitySource("Teste"));
 
-        services.MapQueue<Test1_Service, Test1_DTO>("fila1", 10, (svc, data) => svc.Run(data));
-        services.MapQueue<Test1_Service, Test1_DTO>("fila2", 10, (svc, data) => svc.Run(data));
-
+        services.MapQueue<Test1_Service, Test1_DTO>(cfg => cfg
+            .WithAdapter((svc, data) => svc.Run(data))
+            .WithQueueName("fila1")
+            .WithPrefetchCount(10)
+        );
+        services.MapQueue<Test1_Service, Test1_DTO>(cfg => cfg
+            .WithAdapter((svc, data) => svc.Run(data))
+            .WithQueueName("fila2")
+            .WithPrefetchCount(10)
+        );
+        
         var sp = services.BuildServiceProvider();
         Assert.Equal(2, sp.GetServices<IHostedService>().ToArray().Length);
         Assert.Equal(2, sp.GetServices<IHostedService>().ToArray().Length);
@@ -124,9 +134,16 @@ public class DependencyInjectionTests
         builder.Services.AddSingleton(mockSerializer.Object);
         builder.Services.AddSingleton(new ActivitySource("Test"));
 
-        builder.Services.MapQueue<Test1_Service, Test1_DTO>("fila1", 10, (svc, data) => svc.Run(data));
-        builder.Services.MapQueue<Test1_Service, Test1_DTO>("fila2", 11, (svc, data) => svc.Run(data));
-
+        builder.Services.MapQueue<Test1_Service, Test1_DTO>(cfg => cfg
+            .WithAdapter((svc, data) => svc.Run(data))
+            .WithQueueName("fila1")
+            .WithPrefetchCount(10)
+        );
+        builder.Services.MapQueue<Test1_Service, Test1_DTO>(cfg => cfg
+            .WithAdapter((svc, data) => svc.Run(data))
+            .WithQueueName("fila2")
+            .WithPrefetchCount(11)
+        );
         var app = builder.Build();
 
         CancellationTokenSource source = new CancellationTokenSource();

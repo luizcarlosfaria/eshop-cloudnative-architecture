@@ -1,7 +1,9 @@
 ﻿
+using eShopCloudNative.Architecture.Messaging;
 using eShopCloudNative.Architecture.Messaging.Consumer;
 using eShopCloudNative.Architecture.Messaging.Serialization;
 using FluentAssertions.Common;
+using k8s.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.DependencyInjection;
@@ -67,9 +69,17 @@ public class AsyncQueueConsumerFlowTests
         var mockConnection = new Mock<IConnection>();
         mockConnection.Setup(it => it.CreateModel()).Returns(mockModel.Object);
 
-        Test1_Service service = new Test1_Service();
+        ServiceCollection services = new ServiceCollection();
+        services.AddLogging();
+        var service = new Test1_Service();
+        services.AddSingleton<ITest1_Service>(service);
+        services.AddSingleton(mockConnection.Object);
+        services.AddSingleton<IAMQPSerializer>(new NewtonsoftAMQPSerializer(activitySource));
+        services.AddSingleton(activitySource);
 
-        var asyncQueueConsumer = new AsyncQueueConsumer<Test1_DTO, Task>(new Mock<ILogger>().Object, mockConnection.Object, new NewtonsoftAMQPSerializer(activitySource), activitySource, "", 1, (request) => service.Run(request));
+        services.MapQueue<ITest1_Service, Test1_DTO>(cfg => cfg.WithAdapter((svc, data) => svc.Run(data)).WithQueueName("a").WithPrefetchCount(1));
+        
+        AsyncQueueConsumer<ITest1_Service, Test1_DTO, Task> asyncQueueConsumer = (AsyncQueueConsumer<ITest1_Service, Test1_DTO, Task>)services.BuildServiceProvider().GetRequiredService<IHostedService>();
 
         CancellationTokenRegistration registration = new CancellationTokenRegistration();
         CancellationToken cancellationToken = registration.Token;
@@ -114,12 +124,17 @@ public class AsyncQueueConsumerFlowTests
         var mockConnection = new Mock<IConnection>();
         mockConnection.Setup(it => it.CreateModel()).Returns(mockModel.Object);
 
-        Test1_Service service = new Test1_Service();
+        ServiceCollection services = new ServiceCollection();
+        services.AddLogging();
+        var service = new Test1_Service();
+        services.AddSingleton<ITest1_Service>(service);
+        services.AddSingleton(mockConnection.Object);
+        services.AddSingleton<IAMQPSerializer>(new NewtonsoftAMQPSerializer(activitySource));
+        services.AddSingleton(activitySource);
 
-        var asyncQueueConsumer = new AsyncQueueConsumer<Test1_DTO, Task>(new Mock<ILogger>().Object, mockConnection.Object, new NewtonsoftAMQPSerializer(activitySource), activitySource, "", 1, (request) =>
-        {
-            throw new InvalidOperationException("falhou");
-        });
+        services.MapQueue<ITest1_Service, Test1_DTO>(cfg => cfg.WithAdapter((svc, data) => throw new InvalidOperationException("falhou")).WithQueueName("a").WithPrefetchCount(1));
+
+        AsyncQueueConsumer<ITest1_Service, Test1_DTO, Task> asyncQueueConsumer = (AsyncQueueConsumer<ITest1_Service, Test1_DTO, Task>)services.BuildServiceProvider().GetRequiredService<IHostedService>();
 
         CancellationTokenRegistration registration = new CancellationTokenRegistration();
         CancellationToken cancellationToken = registration.Token;
@@ -138,7 +153,59 @@ public class AsyncQueueConsumerFlowTests
 
         await asyncQueueConsumer.StopAsync(cancellationToken);
 
-        mockModel.Verify(it => it.BasicNack(88, false, false));
+        mockModel.Verify(model => model.BasicNack(88, false, false));
+    }
+
+    [Fact]
+    public async Task TestNackRequeueTrueAsync()
+    {
+        var activitySource = new ActivitySource("Test");
+
+        var mockModel = new Mock<IModel>();
+        mockModel.Setup(it =>
+            it.BasicConsume(
+                It.IsAny<string>(),
+                It.IsAny<bool>(),
+                It.IsAny<string>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>(),
+                It.IsAny<IDictionary<string, object>>(),
+                It.IsAny<IBasicConsumer>())
+        ).Returns("consumerTag");
+
+        var mockConnection = new Mock<IConnection>();
+        mockConnection.Setup(it => it.CreateModel()).Returns(mockModel.Object);
+
+        ServiceCollection services = new ServiceCollection();
+        services.AddLogging();
+        var service = new Test1_Service();
+        services.AddSingleton<ITest1_Service>(service);
+        services.AddSingleton(mockConnection.Object);
+        services.AddSingleton<IAMQPSerializer>(new NewtonsoftAMQPSerializer(activitySource));
+        services.AddSingleton(activitySource);
+
+        services.MapQueue<ITest1_Service, Test1_DTO>(cfg => cfg.WithAdapter((svc, data) => throw new InvalidOperationException("falhou")).WithRequeueOnCrash().WithQueueName("a").WithPrefetchCount(1));
+
+        AsyncQueueConsumer<ITest1_Service, Test1_DTO, Task> asyncQueueConsumer = (AsyncQueueConsumer<ITest1_Service, Test1_DTO, Task>)services.BuildServiceProvider().GetRequiredService<IHostedService>();
+
+        CancellationTokenRegistration registration = new CancellationTokenRegistration();
+        CancellationToken cancellationToken = registration.Token;
+
+        await asyncQueueConsumer.StartAsync(cancellationToken);
+
+        var mockBasicProperties = new Mock<IBasicProperties>();
+
+        await asyncQueueConsumer.Receive(this, new RabbitMQ.Client.Events.BasicDeliverEventArgs()
+        {
+            BasicProperties = mockBasicProperties.Object,
+            Body = Encoding.UTF8.GetBytes("""{"id":1, "name": "Luiz"}"""),
+            ConsumerTag = "consumerTag",
+            DeliveryTag = 99,
+        });
+
+        await asyncQueueConsumer.StopAsync(cancellationToken);
+
+        mockModel.Verify(model => model.BasicNack(99, false, true));
     }
 
     [Fact]
@@ -161,9 +228,18 @@ public class AsyncQueueConsumerFlowTests
         var mockConnection = new Mock<IConnection>();
         mockConnection.Setup(it => it.CreateModel()).Returns(mockModel.Object);
 
-        Test1_Service service = new Test1_Service();
 
-        var asyncQueueConsumer = new AsyncQueueConsumer<Test1_DTO, Task>(new Mock<ILogger>().Object, mockConnection.Object, new NewtonsoftAMQPSerializer(activitySource), activitySource, "", 1, (request) => service.Run(request));
+        ServiceCollection services = new ServiceCollection();
+        services.AddLogging();
+        var service = new Test1_Service();
+        services.AddSingleton<ITest1_Service>(service);
+        services.AddSingleton(mockConnection.Object);
+        services.AddSingleton<IAMQPSerializer>(new NewtonsoftAMQPSerializer(activitySource));
+        services.AddSingleton(activitySource);
+
+        services.MapQueue<ITest1_Service, Test1_DTO>(cfg => cfg.WithAdapter((svc, data) => throw new InvalidOperationException("falhou")).WithRequeueOnCrash().WithQueueName("a").WithPrefetchCount(1));
+
+        AsyncQueueConsumer<ITest1_Service, Test1_DTO, Task> asyncQueueConsumer = (AsyncQueueConsumer<ITest1_Service, Test1_DTO, Task>)services.BuildServiceProvider().GetRequiredService<IHostedService>();
 
         CancellationTokenRegistration registration = new CancellationTokenRegistration();
         CancellationToken cancellationToken = registration.Token;
@@ -182,6 +258,6 @@ public class AsyncQueueConsumerFlowTests
 
         await asyncQueueConsumer.StopAsync(cancellationToken);
 
-        mockModel.Verify(it => it.BasicReject(99, false));
+        mockModel.Verify(model => model.BasicReject(99, false));
     }
 }

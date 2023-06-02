@@ -1,7 +1,7 @@
 using Dawn;
 using eShopCloudNative.Architecture.Messaging;
 using eShopCloudNative.Architecture.Messaging.Consumer.Actions;
-using eShopCloudNative.Architecture.Messaging.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -10,23 +10,19 @@ using System.Diagnostics;
 namespace eShopCloudNative.Architecture.Messaging.Consumer;
 
 
-public class AsyncQueueConsumer<TRequest, TResponse> : ConsumerBase
+public class AsyncQueueConsumer<TService, TRequest, TResponse> : ConsumerBase
     where TResponse : Task
     where TRequest : class
 {
-    protected readonly IAMQPSerializer serializer;
-    protected readonly ActivitySource activitySource;
-    protected readonly Func<TRequest, TResponse> dispatchFunc;
+    private AsyncQueueConsumerParameters<TService, TRequest, TResponse> parameters;
 
     #region Constructors 
 
-
-    public AsyncQueueConsumer(ILogger logger, IConnection connection, IAMQPSerializer serializer, ActivitySource activitySource, string queueName, ushort prefetchCount, Func<TRequest, TResponse> dispatchFunc)
-        : base(logger, connection, queueName, prefetchCount)
+    public AsyncQueueConsumer(ILogger logger, AsyncQueueConsumerParameters<TService, TRequest, TResponse> parameters)
+        : base(logger, parameters)
     {
-        this.serializer = Guard.Argument(serializer).NotNull().Value;
-        this.activitySource = Guard.Argument(activitySource).NotNull().Value;
-        this.dispatchFunc = Guard.Argument(dispatchFunc).NotNull().Value;
+        this.parameters = Guard.Argument(parameters).NotNull().Value;
+        this.parameters.Validate();
     }
 
     #endregion
@@ -48,9 +44,9 @@ public class AsyncQueueConsumer<TRequest, TResponse> : ConsumerBase
         Guard.Argument(delivery).NotNull();
         Guard.Argument(delivery.BasicProperties).NotNull();
 
-        using Activity receiveActivity = this.activitySource.SafeStartActivity("AsyncQueueServiceWorker.Receive", ActivityKind.Server);
+        using Activity receiveActivity = this.parameters.ActivitySource.SafeStartActivity("AsyncQueueServiceWorker.Receive", ActivityKind.Server);
         receiveActivity?.SetParentId(delivery.BasicProperties.GetTraceId(), delivery.BasicProperties.GetSpanId(), ActivityTraceFlags.Recorded);
-        receiveActivity?.AddTag("Queue", this.QueueName);
+        receiveActivity?.AddTag("Queue", this.parameters.QueueName);
         receiveActivity?.AddTag("MessageId", delivery.BasicProperties.MessageId);
         receiveActivity?.AddTag("CorrelationId", delivery.BasicProperties.CorrelationId);
 
@@ -72,7 +68,7 @@ public class AsyncQueueConsumer<TRequest, TResponse> : ConsumerBase
         request = default;
         try
         {
-            request = this.serializer.Deserialize<TRequest>(receivedItem);
+            request = this.parameters.Serializer.Deserialize<TRequest>(receivedItem);
         }
         catch (Exception exception)
         {
@@ -92,17 +88,27 @@ public class AsyncQueueConsumer<TRequest, TResponse> : ConsumerBase
 
         IAMQPResult returnValue;
 
-        using Activity dispatchActivity = this.activitySource.SafeStartActivity("AsyncQueueServiceWorker.Dispatch", ActivityKind.Internal, receiveActivity.Context);
+        using Activity dispatchActivity = this.parameters.ActivitySource.SafeStartActivity("AsyncQueueServiceWorker.Dispatch", ActivityKind.Internal, receiveActivity.Context);
 
         try
         {
-            await this.dispatchFunc(request);
+            if (this.parameters.DispatchScope == DispatchScope.RootScope)
+            {
+                await this.parameters.AdapterFunc(this.parameters.ServiceProvider.GetRequiredService<TService>(), request);
+            }
+            else if (this.parameters.DispatchScope == DispatchScope.ChildScope)
+            {
+                using (var scope = this.parameters.ServiceProvider.CreateScope())
+                {
+                    await this.parameters.AdapterFunc(scope.ServiceProvider.GetRequiredService<TService>(), request);
+                }
+            }
             returnValue = new AckResult();
         }
         catch (Exception exception)
         {
-            this.logger.LogWarning("Exception on processing message {queueName} {exception}", this.QueueName, exception);
-            returnValue = new NackResult(false);
+            this.logger.LogWarning("Exception on processing message {queueName} {exception}", this.parameters.QueueName, exception);
+            returnValue = new NackResult(this.parameters.RequeueOnCrash);
         }
 
         dispatchActivity?.SetEndTime(DateTime.UtcNow);

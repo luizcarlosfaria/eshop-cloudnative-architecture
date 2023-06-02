@@ -1,3 +1,4 @@
+using Dawn;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Polly;
@@ -12,24 +13,21 @@ namespace eShopCloudNative.Architecture.Messaging.Consumer;
 public abstract class ConsumerBase : BackgroundService
 {
     protected readonly ILogger logger;
-    protected readonly IConnection connection;
+    protected IConnection connection;
     protected IBasicConsumer consumer;
     private string consumerTag;
+    private ConsumerBaseParameters parameters;
 
     protected IModel Model { get; private set; }
 
-    public ushort PrefetchCount { get; }
-
-    public string QueueName { get; }
 
     #region Constructors 
 
-    protected ConsumerBase(ILogger logger, IConnection connection, string queueName, ushort prefetchCount)
+    protected ConsumerBase(ILogger logger, ConsumerBaseParameters parameters)
     {
-        this.logger = logger;
-        this.connection = connection;
-        this.QueueName = queueName;
-        this.PrefetchCount = prefetchCount;
+        this.logger = Guard.Argument(logger).NotNull().Value;
+        this.parameters = Guard.Argument(parameters).NotNull().Value;
+        this.parameters.Validate();
     }
 
 
@@ -37,26 +35,28 @@ public abstract class ConsumerBase : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        this.Model = this.connection.CreateModel();
-
-        this.Model.BasicQos(0, this.PrefetchCount, false);
-
-        this.consumer = this.BuildConsumer();
+        this.connection = this.parameters.ConnectionFactoryFunc();
 
         await this.WaitQueueCreationAsync();
 
+        this.Model = this.connection.CreateModel();
+
+        this.Model.BasicQos(0, this.parameters.PrefetchCount, false);
+
+        this.consumer = this.BuildConsumer();
+
         DateTimeOffset startTime = DateTimeOffset.UtcNow;
 
-        this.logger.LogInformation($"Consuming Queue {this.QueueName} since: {startTime}");
+        this.logger.LogInformation($"Consuming Queue {this.parameters.QueueName} since: {startTime}");
 
         this.consumerTag = this.Model.BasicConsume(
-                         queue: this.QueueName,
+                         queue: this.parameters.QueueName,
                          autoAck: false,
                          consumer: consumer);
 
         while (!stoppingToken.IsCancellationRequested)
         {
-            this.logger.LogInformation($"Consuming Queue {this.QueueName} since: {startTime} uptime: {DateTimeOffset.Now - startTime}");
+            this.logger.LogInformation($"Consuming Queue {this.parameters.QueueName} since: {startTime} uptime: {DateTimeOffset.Now - startTime}");
             await Task.Delay(1000, stoppingToken);
         }
     }
@@ -65,16 +65,16 @@ public abstract class ConsumerBase : BackgroundService
     {
         await Policy
         .Handle<OperationInterruptedException>()
-            .WaitAndRetryAsync(5, retryAttempt =>
+            .WaitAndRetryAsync(this.parameters.TestQueueRetryCount, retryAttempt =>
             {
                 var timeToWait = TimeSpan.FromSeconds(Math.Pow(2, retryAttempt));
-                this.logger.LogWarning("Queue {queueName} not found... We will try in {tempo}.", this.QueueName, timeToWait);
+                this.logger.LogWarning("Queue {queueName} not found... We will try in {tempo}.", this.parameters.QueueName, timeToWait);
                 return timeToWait;
             })
             .ExecuteAsync(() =>
             {
                 using IModel testModel = this.connection.CreateModel();
-                testModel.QueueDeclarePassive(this.QueueName);
+                testModel.QueueDeclarePassive(this.parameters.QueueName);
                 return Task.CompletedTask;
             });
     }
