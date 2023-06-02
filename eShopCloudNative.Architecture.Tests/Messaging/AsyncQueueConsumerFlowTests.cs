@@ -101,7 +101,7 @@ public class AsyncQueueConsumerFlowTests
         Assert.Equal(1, service.Data.Id);
         Assert.Equal("Luiz", service.Data.Name);
 
-        mockModel.Verify(it => it.BasicAck(77, false));
+        mockModel.Verify(model => model.BasicAck(77, false));
     }
 
     [Fact]
