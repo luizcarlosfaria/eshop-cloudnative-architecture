@@ -54,9 +54,20 @@ public abstract class ConsumerBase : BackgroundService
                          autoAck: false,
                          consumer: consumer);
 
+        int timeToDisplay = (int)this.parameters.DisplayLoopInConsoleEvery.TotalSeconds;
+
+
+        long loopCount = 0;
         while (!stoppingToken.IsCancellationRequested)
         {
-            this.logger.LogInformation($"Consuming Queue {this.parameters.QueueName} since: {startTime} uptime: {DateTimeOffset.Now - startTime}");
+            loopCount++;
+            string logMessage = $"Consuming Queue {this.parameters.QueueName} since: {startTime} uptime: {DateTimeOffset.Now - startTime}";
+
+            if (loopCount % timeToDisplay == 0)
+                this.logger.LogInformation(logMessage);
+            else
+                this.logger.LogTrace(logMessage);
+
             await Task.Delay(1000, stoppingToken);
         }
     }

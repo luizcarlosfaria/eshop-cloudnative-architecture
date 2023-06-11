@@ -33,6 +33,7 @@ public static class DependencyInjectionExtensions
             {
                 AsyncQueueConsumerParameters<TService, TRequest, Task<TResponse>> parameters = new AsyncQueueConsumerParameters<TService, TRequest, Task<TResponse>>();
                 parameters.WithServiceProvider(sp);
+                parameters.WithDisplayLoopInConsoleEvery(TimeSpan.FromMinutes(1));
                 parameters.WithTestQueueRetryCount(5);
                 parameters.WithConnectionFactoryFunc(() => sp.GetRequiredService<IConnection>());
                 parameters.WithDispatchInRootScope();
@@ -68,6 +69,7 @@ public static class DependencyInjectionExtensions
 
             AsyncQueueConsumerParameters<TService, TRequest, Task> parameters = new AsyncQueueConsumerParameters<TService, TRequest, Task>();
             parameters.WithServiceProvider(sp);
+            parameters.WithDisplayLoopInConsoleEvery(TimeSpan.FromMinutes(1));
             parameters.WithTestQueueRetryCount(5);
             parameters.WithConnectionFactoryFunc( () => sp.GetRequiredService<IConnection>() );
             parameters.WithDispatchInRootScope();

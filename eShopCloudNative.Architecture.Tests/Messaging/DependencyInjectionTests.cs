@@ -91,9 +91,9 @@ public class DependencyInjectionTests
         services.AddSingleton(new ActivitySource("Teste"));
 
         services.MapQueue<Test1_Service, Test1_DTO>(cfg => cfg
-            .WithAdapter((svc, data) => svc.Run(data))
+            .WithAdapter((svc, data) => svc.Run(data))            
             .WithQueueName("fila1")
-            .WithPrefetchCount(10)
+            .WithPrefetchCount(10)            
         );
         services.MapQueue<Test1_Service, Test1_DTO>(cfg => cfg
             .WithAdapter((svc, data) => svc.Run(data))

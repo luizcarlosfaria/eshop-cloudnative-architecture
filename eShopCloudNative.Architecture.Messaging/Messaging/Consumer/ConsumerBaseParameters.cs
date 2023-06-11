@@ -33,7 +33,12 @@ public class ConsumerBaseParameters
         return this;
     }
 
-
+    public TimeSpan DisplayLoopInConsoleEvery { get; private set; }
+    public ConsumerBaseParameters WithDisplayLoopInConsoleEvery(TimeSpan timeToDisplay)
+    {
+        this.DisplayLoopInConsoleEvery = timeToDisplay;
+        return this;
+    }
 
     public virtual void Validate()
     {
