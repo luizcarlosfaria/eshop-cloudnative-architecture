@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace eShopCloudNative.Architecture.Logging;
 public class EnterpriseApplicationLogContext : IDisposable
 {
-    private IDisposable serilogLogContext;
+
     private string className;
     private string methodName;
     public long startAt;
@@ -31,10 +31,26 @@ public class EnterpriseApplicationLogContext : IDisposable
 
         action?.Invoke(tags);
 
-        this.serilogLogContext = LogContext.Push(tags.Select(it => new PropertyEnricher(it.Key, it.Value, true)).ToArray());
         this.className = className;
         this.methodName = methodName;
         this.startAt = DateTime.Now.Ticks;
+    }
+
+    public void SetException(Exception ex)
+    {
+        Guard.Argument(ex, nameof(ex)).NotNull();
+
+        ExceptionTag tag = (ExceptionTag)this.tags.SingleOrDefault(it => it.Type ==  TagType.Exception);
+
+        if (tag != null)
+        { 
+            tag.UpdateException(ex);
+        }
+        else
+        {
+            tag = new ExceptionTag(ex);
+            this.tags.Add(tag);
+        }
     }
 
     private string BuildSignature()
@@ -53,9 +69,14 @@ public class EnterpriseApplicationLogContext : IDisposable
     public void Dispose()
     {
         this.endAt = DateTime.Now.Ticks;
+        var elapsed = TimeSpan.FromTicks(endAt - startAt);
 
-        Log.Information($"{this.BuildSignature()} | Telemetry | {{Elapsed}}", TimeSpan.FromTicks(endAt - startAt));
+        var list = this.tags.Select(it => new PropertyEnricher(it.Key, it.Value, true)).ToList();
+        list.Add(new PropertyEnricher("elapsed", elapsed, true));
 
-        serilogLogContext.Dispose();
+        using (IDisposable serilogLogContext = LogContext.Push(list.ToArray()))
+        {
+            Log.Information($"{this.BuildSignature()} | Telemetry | {{Elapsed}}", elapsed);
+        }
     }
 }
