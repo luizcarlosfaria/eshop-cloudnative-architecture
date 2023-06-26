@@ -14,19 +14,19 @@ namespace eShopCloudNative.Architecture.Logging;
 
 public class EnterpriseApplicationLog
 {
-    
+
     public static void SetGlobalContext(string applicationIdentity, Action<List<Tag>> tagBuilder = null)
     {
         Guard.Argument(applicationIdentity, nameof(applicationIdentity)).NotNull().NotEmpty().NotWhiteSpace();
 
         var tags = new List<Tag>
         {
-            { "Application", applicationIdentity },
-            { "Hostname", Environment.MachineName },
-            { "UserName", Environment.UserName },
-            { "Platform", Environment.OSVersion.Platform },
-            { "OSVersion", Environment.OSVersion.ToString() },
-            { "ServiceStartup", new { Utc = DateTime.UtcNow, Local = DateTime.Now } }
+            new Tag("Application", TagType.Property, applicationIdentity),
+            new Tag("Hostname", TagType.Property, Environment.MachineName) ,
+            new Tag("UserName", TagType.Property, Environment.UserName) ,
+            new Tag("Platform", TagType.Property, Environment.OSVersion.Platform) ,
+            new Tag("OSVersion", TagType.Property, Environment.OSVersion.ToString()) ,
+            new Tag("ServiceStartup", TagType.Property, new { Utc = DateTime.UtcNow, Local = DateTime.Now })
         };
 
         tagBuilder?.Invoke(tags);

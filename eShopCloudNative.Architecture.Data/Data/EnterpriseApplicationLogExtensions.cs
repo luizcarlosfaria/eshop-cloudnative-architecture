@@ -23,10 +23,12 @@ public enum DataOperation
 [ExcludeFromCodeCoverage]
 public static class EnterpriseApplicationLogExtensions
 {
-    public static List<Tag> AddDataOperation(this List<Tag> tags, DataOperation operation)
+    public static EnterpriseApplicationLogContext AddDataOperation(this EnterpriseApplicationLogContext context, DataOperation operation)
     {
-        Guard.Argument(tags, nameof(tags)).NotNull();
-        tags.Add(new Tag("Operation", TagType.None, operation.ToString()));
-        return tags;
+        Guard.Argument(context, nameof(context)).NotNull();
+
+        context.Add("Operation", TagType.None, operation.ToString());
+        
+        return context;
     }
 }

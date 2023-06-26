@@ -4,6 +4,5 @@ public enum TagType
 { 
     None,
     Argument,
-    Property,
-    Exception
+    Property
 }

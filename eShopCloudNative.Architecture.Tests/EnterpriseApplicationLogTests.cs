@@ -19,7 +19,7 @@ public class EnterpriseApplicationLogTests
         {
             EnterpriseApplicationLog.SetGlobalContext("a");
 
-            EnterpriseApplicationLog.SetGlobalContext("a", it => it.Add("a", "b"));
+            EnterpriseApplicationLog.SetGlobalContext("a", it => it.Add(new Tag("a", TagType.None, "b")));
 
             pass = true;
         }

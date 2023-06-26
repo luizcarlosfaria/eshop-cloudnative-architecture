@@ -17,50 +17,33 @@ public class EnterpriseApplicationLogContext : IDisposable
     private string methodName;
     public long startAt;
     private long endAt;
-    private List<Tag> tags;
+    internal List<Tag> Tags { get; private set; }
+    public Exception Exception { get; internal set; }
 
-    public EnterpriseApplicationLogContext(string className, string methodName, Action<List<Tag>> action)
+    public EnterpriseApplicationLogContext(string className, [System.Runtime.CompilerServices.CallerMemberName] string methodName = "")
     {
         Guard.Argument(className, nameof(className)).NotNull().NotEmpty().NotWhiteSpace();
         Guard.Argument(methodName, nameof(methodName)).NotNull().NotEmpty().NotWhiteSpace();
-        Guard.Argument(action, nameof(action)).NotNull();
 
-        this.tags = new List<Tag>()
-            .Add("Class", className)
-            .Add("Method", methodName);
-
-        action?.Invoke(tags);
+        this.Tags = new List<Tag>();
+        this.Add("Class", className);
+        this.Add("Method", methodName);
 
         this.className = className;
         this.methodName = methodName;
         this.startAt = DateTime.Now.Ticks;
     }
 
-    public void SetException(Exception ex)
-    {
-        Guard.Argument(ex, nameof(ex)).NotNull();
 
-        ExceptionTag tag = (ExceptionTag)this.tags.SingleOrDefault(it => it.Type ==  TagType.Exception);
-
-        if (tag != null)
-        { 
-            tag.UpdateException(ex);
-        }
-        else
-        {
-            tag = new ExceptionTag(ex);
-            this.tags.Add(tag);
-        }
-    }
 
     private string BuildSignature()
     {
-        var arguments = this.tags
+        var arguments = this.Tags
             .Where(it => it.Type == TagType.Argument)
             .Select(it => $"{it.Key}: {it.Value}")
             .ToArray();
 
-        var returnValue = $"{className}.{methodName}({string.Join(",", arguments)})";
+        var returnValue = $"{this.className}.{this.methodName}({string.Join(",", arguments)})";
 
         return returnValue;
     }
@@ -69,14 +52,17 @@ public class EnterpriseApplicationLogContext : IDisposable
     public void Dispose()
     {
         this.endAt = DateTime.Now.Ticks;
-        var elapsed = TimeSpan.FromTicks(endAt - startAt);
+        var elapsed = TimeSpan.FromTicks(this.endAt - this.startAt);
 
-        var list = this.tags.Select(it => new PropertyEnricher(it.Key, it.Value, true)).ToList();
+        var list = this.Tags.Select(it => new PropertyEnricher(it.Key, it.Value, true)).ToList();
         list.Add(new PropertyEnricher("elapsed", elapsed, true));
 
         using (IDisposable serilogLogContext = LogContext.Push(list.ToArray()))
         {
-            Log.Information($"{this.BuildSignature()} | Telemetry | {{Elapsed}}", elapsed);
+            if (this.Exception != null)
+                Log.Error(this.Exception, $"{this.BuildSignature()} | Telemetry | {{elapsed}}", elapsed);
+            else
+                Log.Information($"{this.BuildSignature()} | Telemetry | {{elapsed}}", elapsed);
         }
     }
 }

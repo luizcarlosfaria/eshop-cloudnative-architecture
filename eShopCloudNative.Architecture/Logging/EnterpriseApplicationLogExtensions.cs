@@ -16,40 +16,115 @@ public static class EnterpriseApplicationLogExtensions
 {
     #region Tag Facilities
 
-    public static List<Tag> Add(this List<Tag> tags, string key, object value) => tags.Add(key, TagType.None, value);
+    public static EnterpriseApplicationLogContext Add(this EnterpriseApplicationLogContext context, string key, object value) => context.Add(key, TagType.None, value);
 
-    public static List<Tag> AddArgument(this List<Tag> tags, string key, object value) => tags.Add(key, TagType.Argument, value);
+    public static EnterpriseApplicationLogContext AddArgument(this EnterpriseApplicationLogContext context, string key, object value) => context.Add(key, TagType.Argument, value);
 
-    public static List<Tag> AddProperty(this List<Tag> tags, string key, object value) => tags.Add(key, TagType.Property, value);
+    public static EnterpriseApplicationLogContext AddProperty(this EnterpriseApplicationLogContext context, string key, object value) => context.Add(key, TagType.Property, value);
 
-    public static List<Tag> Add(this List<Tag> tags, string key, TagType tagType, object value)
+    public static EnterpriseApplicationLogContext Add(this EnterpriseApplicationLogContext context, string key, TagType tagType, object value)
     {
-        Guard.Argument(tags, nameof(tags)).NotNull();
+        Guard.Argument(context, nameof(context)).NotNull();
+        Guard.Argument(context.Tags, nameof(context.Tags)).NotNull();
         Guard.Argument(key, nameof(key)).NotNull().NotEmpty().NotWhiteSpace();
-        tags.Add(new Tag(key, tagType, value));
-        return tags;
+        context.Tags.Add(new Tag(key, tagType, value));
+        return context;
     }
 
-    public static List<Tag> Remove(this List<Tag> tags, string key)
+    public static EnterpriseApplicationLogContext Remove(this EnterpriseApplicationLogContext context, string key)
     {
-        Guard.Argument(tags, nameof(tags)).NotNull();
+        Guard.Argument(context, nameof(context)).NotNull();
+        Guard.Argument(context.Tags, nameof(context.Tags)).NotNull();
         Guard.Argument(key, nameof(key)).NotNull().NotEmpty().NotWhiteSpace();
 
-        return tags.Remove(it => it.Key == key);
+        context.Remove(it => it.Key == key);
+
+        return context;
     }
 
-    public static List<Tag> Remove(this List<Tag> tags, Func<Tag, bool> predicate)
+    public static EnterpriseApplicationLogContext Remove(this EnterpriseApplicationLogContext context, Func<Tag, bool> predicate)
     {
-        Guard.Argument(tags, nameof(tags)).NotNull();
+        Guard.Argument(context, nameof(context)).NotNull();
+        Guard.Argument(context.Tags, nameof(context.Tags)).NotNull();
         Guard.Argument(predicate, nameof(predicate)).NotNull();
 
-        var itensToDelete = tags.Where(predicate).ToArray();
+        var itensToDelete = context.Tags.Where(predicate).ToArray();
+
         foreach (var itemToDelete in itensToDelete)
-            tags.Remove(itemToDelete);
-        return tags;
+            context.Tags.Remove(itemToDelete);
+
+        return context;
     }
 
     #endregion
+
+    #region Exception Management
+
+
+    public static void ExecuteAndCatch(this EnterpriseApplicationLogContext context, Action actionToExecute)
+    {
+        Guard.Argument(context, nameof(context)).NotNull();
+        try
+        {
+            actionToExecute();
+        }
+        catch (Exception exception)
+        {
+            context.Exception = exception;
+            throw;
+        }
+    }
+
+    public static async Task ExecuteAndCatchAsync(this EnterpriseApplicationLogContext context, Func<Task> actionToExecute)
+    {
+        Guard.Argument(context, nameof(context)).NotNull();
+        try
+        {
+            await actionToExecute();
+        }
+        catch (Exception exception)
+        {
+            context.Exception = exception;
+            throw;
+        }
+    }
+
+    public static T GetAndCatch<T>(this EnterpriseApplicationLogContext context, Func<T> functionToExecute)
+    {
+        Guard.Argument(context, nameof(context)).NotNull();
+        try
+        {
+            return functionToExecute();
+        }
+        catch (Exception exception)
+        {
+            context.Exception = exception;
+            throw;
+        }
+    }
+
+    public static async Task<T> GetAndCatchAsync<T>(this EnterpriseApplicationLogContext context, Func<Task<T>> functionToExecute)
+    {
+        Guard.Argument(context, nameof(context)).NotNull();
+        try
+        {
+            return await functionToExecute();
+        }
+        catch (Exception exception)
+        {
+            context.Exception = exception;
+            throw;
+        }
+    }
+
+
+    public static IEnumerable<Tag> GetTags(this EnterpriseApplicationLogContext context)
+    {
+        Guard.Argument(context, nameof(context)).NotNull();
+        return context.Tags.ToArray();
+    }
+    #endregion
+
 
     #region Configuration
 
