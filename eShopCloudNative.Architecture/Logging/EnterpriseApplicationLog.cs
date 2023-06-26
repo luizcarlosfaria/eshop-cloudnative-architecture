@@ -36,4 +36,45 @@ public class EnterpriseApplicationLog
             GlobalLogContext.PushProperty(tag.Key, tag.Value, true);
         }
     }
+
+    public static void ExecuteWithLog(Action<EnterpriseApplicationLogContext> configure, Action actionToExecute)
+    {
+        using (var logContext = new EnterpriseApplicationLogContext())
+        {
+            configure?.Invoke(logContext);
+
+            logContext.ExecuteWithLog(actionToExecute);
+        }
+    }
+
+    public static async Task ExecuteWithLogAsync(Action<EnterpriseApplicationLogContext> configure, Func<Task> actionToExecute)
+    {
+        using (var logContext = new EnterpriseApplicationLogContext())
+        {
+            configure?.Invoke(logContext);
+
+            await logContext.ExecuteWithLogAsync(actionToExecute);
+        }
+    }
+
+
+    public static TOutput ExecuteWithLogAndReturn<TOutput>(Action<EnterpriseApplicationLogContext> configure, Func<TOutput> actionToExecute)
+    {
+        using (var logContext = new EnterpriseApplicationLogContext())
+        {
+            configure?.Invoke(logContext);
+
+            return logContext.ExecuteWithLogAndReturn(actionToExecute);
+        }
+    }
+    public static async Task<TOutput> ExecuteWithLogAndReturnAsync<TOutput>(Action<EnterpriseApplicationLogContext> configure, Func<Task<TOutput>> actionToExecute)
+    {
+        using (var logContext = new EnterpriseApplicationLogContext())
+        {
+            configure?.Invoke(logContext);
+
+            return await logContext.ExecuteWithLogAndReturnAsync(actionToExecute);
+        }
+    }
+
 }

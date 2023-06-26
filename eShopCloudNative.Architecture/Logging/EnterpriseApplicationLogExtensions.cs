@@ -61,7 +61,7 @@ public static class EnterpriseApplicationLogExtensions
     #region Exception Management
 
 
-    public static void ExecuteAndCatch(this EnterpriseApplicationLogContext context, Action actionToExecute)
+    public static void ExecuteWithLog(this EnterpriseApplicationLogContext context, Action actionToExecute)
     {
         Guard.Argument(context, nameof(context)).NotNull();
         try
@@ -75,7 +75,7 @@ public static class EnterpriseApplicationLogExtensions
         }
     }
 
-    public static async Task ExecuteAndCatchAsync(this EnterpriseApplicationLogContext context, Func<Task> actionToExecute)
+    public static async Task ExecuteWithLogAsync(this EnterpriseApplicationLogContext context, Func<Task> actionToExecute)
     {
         Guard.Argument(context, nameof(context)).NotNull();
         try
@@ -89,7 +89,7 @@ public static class EnterpriseApplicationLogExtensions
         }
     }
 
-    public static T GetAndCatch<T>(this EnterpriseApplicationLogContext context, Func<T> functionToExecute)
+    public static T ExecuteWithLogAndReturn<T>(this EnterpriseApplicationLogContext context, Func<T> functionToExecute)
     {
         Guard.Argument(context, nameof(context)).NotNull();
         try
@@ -103,7 +103,7 @@ public static class EnterpriseApplicationLogExtensions
         }
     }
 
-    public static async Task<T> GetAndCatchAsync<T>(this EnterpriseApplicationLogContext context, Func<Task<T>> functionToExecute)
+    public static async Task<T> ExecuteWithLogAndReturnAsync<T>(this EnterpriseApplicationLogContext context, Func<Task<T>> functionToExecute)
     {
         Guard.Argument(context, nameof(context)).NotNull();
         try

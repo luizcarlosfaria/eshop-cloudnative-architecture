@@ -21,49 +21,43 @@ public class ContextTests
 
         using (TestCorrelator.CreateContext())
         {
-            using (var context = new EnterpriseApplicationLogContext("A", "B"))
+
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                Assert.Throws<InvalidOperationException>(() =>
+                EnterpriseApplicationLog.ExecuteWithLog(context => context.SetIdentity<ContextTests>().AddProperty("Tests", 1), () =>
                 {
-                    context.ExecuteAndCatch(() => throw new InvalidOperationException());
+                    throw new InvalidOperationException();
                 });
-                Assert.NotNull(context.Exception);
-            }
+            });
 
             TestCorrelator.GetLogEventsFromCurrentContext()
                 .Should().ContainSingle()
                 .Which.Exception
                 .Should().BeAssignableTo<InvalidOperationException>();
         }
-       
+
     }
 
     [Fact]
     public async Task ExceptionPropagation_ExecuteAndCatchAsync()
     {
         Log.Logger = new LoggerConfiguration().WriteTo.TestCorrelator().CreateLogger();
-
         using (TestCorrelator.CreateContext())
         {
-            using (var context = new EnterpriseApplicationLogContext("A", "B"))
-            {
-                await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-                {
-                    await context.ExecuteAndCatchAsync(() =>
-                    {
-                        throw new InvalidOperationException();
-                    });
-                });
 
-                Assert.NotNull(context.Exception);
-            }
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                await EnterpriseApplicationLog.ExecuteWithLogAsync(context => context.SetIdentity<ContextTests>().AddProperty("Tests", 1), () =>
+                {
+                    throw new InvalidOperationException();
+                });
+            });
 
             TestCorrelator.GetLogEventsFromCurrentContext()
                 .Should().ContainSingle()
                 .Which.Exception
                 .Should().BeAssignableTo<InvalidOperationException>();
         }
-
     }
 
     [Fact]
@@ -73,14 +67,7 @@ public class ContextTests
 
         using (TestCorrelator.CreateContext())
         {
-            using (var context = new EnterpriseApplicationLogContext(nameof(ContextTests)))
-            {
-                context.ExecuteAndCatch(() => { });
-
-                var tags = context.GetTags();
-                Assert.Contains(tags, it => it.Key == "Class" && it.Value as string == nameof(ContextTests));
-                Assert.Contains(tags, it => it.Key == "Method" && it.Value as string == nameof(Success_ExecuteAndCatch));
-            }
+            EnterpriseApplicationLog.ExecuteWithLog(context => context.SetIdentity<ContextTests>().AddProperty("Tests", 1), () => { });
 
             TestCorrelator.GetLogEventsFromCurrentContext()
                 .Should().ContainSingle()
@@ -97,14 +84,8 @@ public class ContextTests
 
         using (TestCorrelator.CreateContext())
         {
-            using (var context = new EnterpriseApplicationLogContext(nameof(ContextTests)))
-            {
-                await context.ExecuteAndCatchAsync(() => Task.CompletedTask);
+            await EnterpriseApplicationLog.ExecuteWithLogAsync(context => context.SetIdentity<ContextTests>().AddProperty("Tests", 1), () => Task.CompletedTask);
 
-                var tags = context.GetTags();
-                Assert.Contains(tags, it => it.Key == "Class" && it.Value as string == nameof(ContextTests));
-                Assert.Contains(tags, it => it.Key == "Method" && it.Value as string == nameof(Success_ExecuteAndCatchAsync));
-            }
             TestCorrelator.GetLogEventsFromCurrentContext()
                 .Should().ContainSingle()
                 .Which.MessageTemplate.Text
@@ -119,15 +100,10 @@ public class ContextTests
 
         using (TestCorrelator.CreateContext())
         {
-            using (var context = new EnterpriseApplicationLogContext(nameof(ContextTests)))
-            {
-                int result = context.GetAndCatch(() => 7);
+            int result = EnterpriseApplicationLog.ExecuteWithLogAndReturn(context => context.SetIdentity<ContextTests>().AddProperty("Tests", 1), () => 7);
 
-                var tags = context.GetTags();
-                Assert.Contains(tags, it => it.Key == "Class" && it.Value as string == nameof(ContextTests));
-                Assert.Contains(tags, it => it.Key == "Method" && it.Value as string == nameof(Success_GetAndCatch));
-                Assert.Equal(7, result);
-            }
+            Assert.Equal(7, result);
+
             TestCorrelator.GetLogEventsFromCurrentContext()
                 .Should().ContainSingle()
                 .Which.MessageTemplate.Text
@@ -142,15 +118,10 @@ public class ContextTests
 
         using (TestCorrelator.CreateContext())
         {
-            using (var context = new EnterpriseApplicationLogContext(nameof(ContextTests)))
-            {
-                int result = await context.GetAndCatchAsync(() => Task.FromResult(7));
+            int result = await EnterpriseApplicationLog.ExecuteWithLogAndReturnAsync<int>(context => context.SetIdentity<ContextTests>().AddProperty("Tests", 1), () => Task.FromResult(7));
 
-                var tags = context.GetTags();
-                Assert.Contains(tags, it => it.Key == "Class" && it.Value as string == nameof(ContextTests));
-                Assert.Contains(tags, it => it.Key == "Method" && it.Value as string == nameof(Success_GetAndCatchAsync));
-                Assert.Equal(7, result);
-            }
+            Assert.Equal(7, result);
+
             TestCorrelator.GetLogEventsFromCurrentContext()
                 .Should().ContainSingle()
                 .Which.MessageTemplate.Text

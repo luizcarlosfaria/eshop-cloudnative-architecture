@@ -6,11 +6,13 @@ using Serilog.Core.Enrichers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace eShopCloudNative.Architecture.Logging;
-public class EnterpriseApplicationLogContext : IDisposable
+public partial class EnterpriseApplicationLogContext : IDisposable
 {
 
     private string className;
@@ -20,20 +22,18 @@ public class EnterpriseApplicationLogContext : IDisposable
     internal List<Tag> Tags { get; private set; }
     public Exception Exception { get; internal set; }
 
-    public EnterpriseApplicationLogContext(string className, [System.Runtime.CompilerServices.CallerMemberName] string methodName = "")
+    public EnterpriseApplicationLogContext()
     {
-        Guard.Argument(className, nameof(className)).NotNull().NotEmpty().NotWhiteSpace();
-        Guard.Argument(methodName, nameof(methodName)).NotNull().NotEmpty().NotWhiteSpace();
-
         this.Tags = new List<Tag>();
-        this.Add("Class", className);
-        this.Add("Method", methodName);
-
-        this.className = className;
-        this.methodName = methodName;
         this.startAt = DateTime.Now.Ticks;
     }
 
+    public EnterpriseApplicationLogContext SetIdentity<T>([CallerMemberName] string methodName = "")
+    {
+        this.className = typeof(T).Name;
+        this.methodName = methodName;
+        return this;
+    }
 
 
     private string BuildSignature()
@@ -56,11 +56,13 @@ public class EnterpriseApplicationLogContext : IDisposable
 
         var list = this.Tags.Select(it => new PropertyEnricher(it.Key, it.Value, true)).ToList();
         list.Add(new PropertyEnricher("elapsed", elapsed, true));
+        list.Add(new PropertyEnricher("Class", className, true));
+        list.Add(new PropertyEnricher("Method", methodName, true));
 
         using (IDisposable serilogLogContext = LogContext.Push(list.ToArray()))
         {
             if (this.Exception != null)
-                Log.Error(this.Exception, $"{this.BuildSignature()} | Telemetry | {{elapsed}}", elapsed);
+                Log.Error(this.Exception, $"{this.BuildSignature()} | Error | {{elapsed}}", elapsed);
             else
                 Log.Information($"{this.BuildSignature()} | Telemetry | {{elapsed}}", elapsed);
         }
