@@ -52,7 +52,7 @@ public abstract class ConsumerBase : BackgroundService
         this.consumerTag = this.Model.BasicConsume(
                          queue: this.parameters.QueueName,
                          autoAck: false,
-                         consumer: consumer);
+                         consumer: this.consumer);
 
         int timeToDisplay = (int)this.parameters.DisplayLoopInConsoleEvery.TotalSeconds;
 

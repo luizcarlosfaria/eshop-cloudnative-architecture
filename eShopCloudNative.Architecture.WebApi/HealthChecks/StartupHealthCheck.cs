@@ -12,8 +12,8 @@ public class StartupHealthCheck : IHealthCheck
 
     public bool StartupCompleted
     {
-        get => isReady;
-        set => isReady = value;
+        get => this.isReady;
+        set => this.isReady = value;
     }
 
     public Task<HealthCheckResult> CheckHealthAsync(
