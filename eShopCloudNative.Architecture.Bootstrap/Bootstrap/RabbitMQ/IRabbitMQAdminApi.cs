@@ -62,10 +62,7 @@ public class Metadata
 
 public class VirtualHost
 {
-
-    //[JsonProperty("cluster_state")]
-    //public JObject ClusterState { get; set; }
-
+    
     [JsonProperty("description")]
     public string Description { get; set; }
 
@@ -98,8 +95,7 @@ public class User
     [JsonProperty("tags")]
     public IList<string> Tags { get; set; }
 
-    //[JsonProperty("limits")]
-    //public Limits Limits { get; set; }
+
 }
 
 public class CreateUserRequest
