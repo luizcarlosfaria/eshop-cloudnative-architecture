@@ -37,7 +37,7 @@ public class MinioBootstrapperService : IBootstrapperService
 
             foreach (var bucket in this.BucketsToCreate)
             {
-                if (oldBuckets.Any(it => it.Name == bucket.BucketName) == false)
+                if (!oldBuckets.Any(it => it.Name == bucket.BucketName))
                 {
                     await this.Minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucket.BucketName));
 
