@@ -4,8 +4,21 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
         <RootNamespace>eShopCloudNative.Architecture</RootNamespace>
-        <AnalysisLevel>preview-all</AnalysisLevel>
+        
     </PropertyGroup>
+	<PropertyGroup>
+		<!--<AnalysisLevel>preview-all</AnalysisLevel>-->
+		<!--<AnalysisLevel>preview-recommended</AnalysisLevel>-->
+		<!--<AnalysisLevel>preview-minimum</AnalysisLevel>-->
+		<AnalysisLevel>preview</AnalysisLevel>
+
+
+		<!--<AnalysisLevel>latest-all</AnalysisLevel>-->
+		<!--<AnalysisLevel>latest-recommended</AnalysisLevel>-->
+		<!--<AnalysisLevel>latest-minimum</AnalysisLevel>-->
+		<!--<AnalysisLevel>latest</AnalysisLevel>-->
+
+	</PropertyGroup>
     <PropertyGroup>
         <Authors>luizcarlosfaria</Authors>
         <Company>gaGO.io | Cloud Native .NET</Company>
