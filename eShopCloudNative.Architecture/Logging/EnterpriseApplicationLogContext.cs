@@ -35,6 +35,19 @@ public partial class EnterpriseApplicationLogContext : IDisposable
         return this;
     }
 
+    public EnterpriseApplicationLogContext SetIdentity(string className, string methodName)
+    {
+        this.className = className;
+        this.methodName = methodName;
+        return this;
+    }
+
+
+    public EnterpriseApplicationLogContext SetException(Exception ex)
+    {
+        this.Exception = ex;
+        return this;
+    }
 
     private string BuildSignature()
     {

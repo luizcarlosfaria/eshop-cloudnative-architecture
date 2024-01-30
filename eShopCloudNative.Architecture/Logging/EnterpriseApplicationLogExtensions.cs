@@ -103,7 +103,7 @@ public static class EnterpriseApplicationLogExtensions
         }
     }
 
-    public static async Task<T> ExecuteWithLogAndReturnAsync<T>(this EnterpriseApplicationLogContext context, Func<Task<T>> functionToExecute)
+    public static async Task<T> ExecuteWithLogAndReturnAsync<T>(this EnterpriseApplicationLogContext context, Func<Task<T>> functionToExecute)        
     {
         Guard.Argument(context, nameof(context)).NotNull();
         try
