@@ -1,4 +1,5 @@
 ﻿using Dawn;
+using eShopCloudNative.Architecture.Logging;
 using eShopCloudNative.Architecture.Messaging.Serialization;
 using System.Diagnostics;
 
@@ -35,6 +36,28 @@ public class AsyncQueueConsumerParameters<TService, TRequest, TResponse> : Consu
         this.AdapterFunc = adapterFunc;
         return this;
     }
+
+    //public AsyncQueueConsumerParameters<TService, TRequest, TResponse> WithEnterpriseApplicationLog(Func<EnterpriseApplicationLogContext, TRequest, TResponse> adapterFunc)        
+    //{
+    //    Guard.Argument(this.AdapterFunc).NotNull();
+
+    //    Func<TService, TRequest, TResponse> oldAdapterFunc = this.AdapterFunc;
+
+    //    this.AdapterFunc = async (svc, msg) =>
+    //    {
+    //        TResponse response = null;
+
+    //        using (var logContext = new EnterpriseApplicationLogContext())
+    //        {
+    //            //logContext.SetIdentity<DiscordSyncService>(nameof(DiscordSyncService.SyncAsync));
+    //            logContext.AddArgument("msg", msg);
+    //            response = await logContext.ExecuteWithLogAndReturnAsync<T>(() => oldAdapterFunc(svc, msg));
+    //        }
+
+    //        return response;
+    //    };
+    //    return this;
+    //}
 
     public DispatchScope DispatchScope { get; private set; }
     public AsyncQueueConsumerParameters<TService, TRequest, TResponse> WithDispatchScope(DispatchScope dispatchScope)

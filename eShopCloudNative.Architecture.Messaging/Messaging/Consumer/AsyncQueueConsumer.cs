@@ -1,4 +1,5 @@
 using Dawn;
+using eShopCloudNative.Architecture.Logging;
 using eShopCloudNative.Architecture.Messaging;
 using eShopCloudNative.Architecture.Messaging.Consumer.Actions;
 using Microsoft.Extensions.DependencyInjection;
@@ -90,25 +91,31 @@ public class AsyncQueueConsumer<TService, TRequest, TResponse> : ConsumerBase
 
         using Activity dispatchActivity = this.parameters.ActivitySource.SafeStartActivity("AsyncQueueServiceWorker.Dispatch", ActivityKind.Internal, receiveActivity.Context);
 
-        try
+        using (var logContext = new EnterpriseApplicationLogContext())
         {
-            if (this.parameters.DispatchScope == DispatchScope.RootScope)
+            try
             {
-                await this.parameters.AdapterFunc(this.parameters.ServiceProvider.GetRequiredService<TService>(), request);
-            }
-            else if (this.parameters.DispatchScope == DispatchScope.ChildScope)
-            {
-                using (var scope = this.parameters.ServiceProvider.CreateScope())
+                TService service = this.parameters.ServiceProvider.GetRequiredService<TService>();
+
+                if (this.parameters.DispatchScope == DispatchScope.RootScope)
                 {
-                    await this.parameters.AdapterFunc(scope.ServiceProvider.GetRequiredService<TService>(), request);
+                    await this.parameters.AdapterFunc(service, request);
                 }
+                else if (this.parameters.DispatchScope == DispatchScope.ChildScope)
+                {
+                    using (var scope = this.parameters.ServiceProvider.CreateScope())
+                    {
+                        await this.parameters.AdapterFunc(service, request);
+                    }
+                }
+                returnValue = new AckResult();
             }
-            returnValue = new AckResult();
-        }
-        catch (Exception exception)
-        {
-            this.logger.LogWarning("Exception on processing message {queueName} {exception}", this.parameters.QueueName, exception);
-            returnValue = new NackResult(this.parameters.RequeueOnCrash);
+            catch (Exception exception)
+            {
+                logContext?.SetException(exception);
+                this.logger.LogWarning("Exception on processing message {queueName} {exception}", this.parameters.QueueName, exception);
+                returnValue = new NackResult(this.parameters.RequeueOnCrash);
+            }
         }
 
         dispatchActivity?.SetEndTime(DateTime.UtcNow);
